@@ -22,8 +22,11 @@ class cspad(psdata.Detector):
     def __init__(self,*args,**kwargs):
 
         psdata.Detector.__init__(self,*args,**kwargs)
-        self.load_geometry(**kwargs)
-        self.load_pixel_coord_indexes(**kwargs)
+        try:
+            self.load_geometry(**kwargs)
+            self.load_pixel_coord_indexes(**kwargs)
+        except:
+            print 'Cannot load geometry'
 
     def load_geometry(self,**kwargs):
         """Load psana geometry data.

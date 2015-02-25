@@ -332,26 +332,6 @@ def write_dictionary(out_dict, file_name, **kwargs):
     except:
         print "Failed writing to ", file_name
 
-#def load_epics_dict(epics_dir=None,epics_file=None, **kwargs):
-#    """Load dictionary of epics pvs into _epics_dict based on
-#       an epicsArch.txt file used by the daq to archive epics
-#       data in the xtc data files.
-#    """
-#    if not epics_file:
-#        epics_file = 'epicsArch.txt'
-#    
-#    if not epics_dir:
-#        if 'instrument' in kwargs and kwargs['instrument']:
-#            instrument = kwargs['instrument']
-#            epics_dir = '/reg/g/pcds/dist/pds/'+instrument+'/misc/'
-#    
-#    if epics_dir: 
-#        epics_dict = lcls_devices.epicsArch_dict(epics_file,epics_dir)
-#    else:
-#        epics_dict = {}
-#    
-#    return epics_dict
-
 def read_device_config(config_file=None, instrument=None, **kwargs):
     """Read device configuration file.  
        By default config_file is assumbed to be named 'device_config.dict' 
@@ -524,93 +504,6 @@ def psana_class_attrs():
 
     return lookup
 
-def get_evt_keys(evt_key):
-    """Returns a dictionary from the key of a psdata event.
-       Events are accessed from a data source ds as follows:
-          evt = ds.events().next()
-       A list of event keys is retrieved as follows:
-          evt_keys = evt.keys()
-    """
-    key_dict = {}
-    if hasattr(evt_key,'src'):
-        src = evt_key.src()
-    else:
-        src = evt_key
-    if hasattr(src,'detName'):
-        if src.devName() in ['Evr']:
-            det_key = src.devName()
-        else:
-            det_key = '_'.join([src.detName(),str(src.detId()),
-                                src.devName(),str(src.devId())])
-        src_attrs = ['detName','detId','devName','devId']
-    elif hasattr(src,'typeName'):
-        det_key = '_'.join([src.typeName(),str(src.type())])
-        src_attrs = ['typeName']
-    else:
-        src_attrs = None
-        det_key = None
-
-    if src_attrs:
-        for attr in src_attrs:
-            key_dict[attr] = getattr(src,attr)()
-
-    if hasattr(evt_key,'alias'):
-        key_dict['alias'] = evt_key.alias()
-
-    if hasattr(evt_key,'type'):
-        key_dict['data'] = {attr: None for attr in dir(evt_key.type()) 
-                 if not attr.startswith(('_','TypeId','Version'))}
-
-        psana_module = evt_key.type().__module__
-        module = psana_module.lstrip('psana.')
-#        module = psana_module.replace('psana.','')
-        psana_class = evt_key.type().__name__
-        if not module:
-            device = psana_class 
-            if not det_key:
-                det_key = psana_class
-        
-        else:
-            if module == 'Bld':
-                device = psana_class.strip('BldData')
-            
-            elif module == 'Lusi':
-                device = psana_class.strip('Fex')
-            else:
-                device = module
-           
-## strip of Version Number           
-            if re.search(r"V.?\b", device):
-                 device = device[:-2]
-            
-            if not det_key:
-                det_key = '_'.join([module,psana_class])
-
-# Bld data do not yet have aliases -- ask daq group to add consistent ones.
-            if module == 'Bld':
-                if 'alias' not in key_dict or not key_dict['alias']:
-                    if det_key[-2] in '_':
-                        key_dict['alias'] = det_key[:-2]
-                    else:
-                        key_dict['alias'] = det_key
-
-        if psana_class == 'EventId':
-            key_dict['alias'] = psana_class
-            key_dict['TypeId'] = 0 
-            key_dict['Version'] = 0
-        else:
-            key_dict['TypeId'] = evt_key.type().TypeId
-            key_dict['Version'] = evt_key.type().Version
-
-        key_dict['psana_module'] = psana_module 
-        key_dict['psana_class'] = psana_class
-        key_dict['device'] = device
-        key_dict['det_key'] = det_key
-        key_dict['evt_key'] = evt_key
-        key_dict['type_key'] = str(key_dict['TypeId'])+'_'+str(key_dict['Version'])
-
-    return key_dict
-
 class psdata(object):
     """Class to organize psana data according to detector sets and make it conveniently
        accessible in ipython.
@@ -639,7 +532,8 @@ class psdata(object):
                      'h5':None,
                      'run':0, 
                      'station':0,
-                     'ffb':None}
+                     'ffb':None,
+                     'cfg':None}
     _epics_devices = {}
     _epics_aliases = {}
     _det_src_list = ['detName','detId','detector','devName','devId','device','processId']
@@ -703,17 +597,16 @@ class psdata(object):
                     pvbase = self._device_sets[det]['pvs'][attr]['base']
                     alias = '_'.join([det,attr])
                     self.add_pv(pvbase, alias)
-#                    self._epics_aliases[alias] = pvbase 
 
         self.set_exp_defaults(**kwargs)
-        if self.get_kwarg('noload'):
-            if self.get_kwarg('epics_live'):
+        if self.get_kwarg('noload') or not live_source():
+            if self._kwargs.get('epics_live'):
                 if not self.get_kwarg('epics_file'):
                     self.set_kwargs(epics_file='epicsArch.txt')
         
         print 'Instrument = ',self.instrument 
-        if self.get_kwarg('epics_file'):
-            print 'Adding epics aliases according to',self.get_kwarg('epics_file')
+        if self._kwargs.get('epics_file'):
+            print 'Adding epics aliases according to',self._kwargs.get('epics_file')
             self.load_epics_dict(**kwargs)
 
         if not self.get_kwarg('noload'):
@@ -723,7 +616,8 @@ class psdata(object):
         if self.ds and self.live:
             self.next_event()
         
-        if self.ds and not self.get_kwarg('epics_file') and not self.get_kwarg('no_epics_aliases'):
+        if self.ds and not self._kwargs.get('epics_file') \
+                and not self._kwargs.get('no_epics_aliases'):
             self.add_aliases_to_device_sets()
             print 'Adding epics aliases to device sets'
 
@@ -735,9 +629,6 @@ class psdata(object):
                     print 'Adding epics ',det
                     self.add_detector(det)
 
-
-#        self.add_detector('empty',empty=True)
-
 #    def add_epics_modules(device_types):
 #        """Add Epics modules from config dictionary.
 #        """
@@ -748,7 +639,6 @@ class psdata(object):
 #                    print 'Loading {det} as {new_class} from {module_path}'.format(
 #                           det=det,new_class=new_class,module_path=module_path)
 #                    setattr(self, det, new_class(det,self))
-
 
     def add_pv(self, pv, alias):
         """Add pv to _device_sets dictionary and _epics_aliases dictionary.
@@ -781,10 +671,7 @@ class psdata(object):
     def get_kwarg(self, arg):
         """Get argument from keyword arguments set during loading of psdata.
         """
-        if arg in self._kwargs:
-            return self._kwargs[arg]
-        else:
-            return None
+        return self._kwargs.get(arg)
 
     def set_kwargs(self, reset=False, **kwargs):
         """Store keywarg arguments set during loading.
@@ -833,8 +720,10 @@ class psdata(object):
         else:
             self.instrument = self.exp[0:3]
 
-        self.instrument_elog = message_poster.message_poster_self( 'NEH', self.instrument.upper()+' Instrument')
-        self.exp_elog = message_poster.message_poster_self( self.instrument.upper(), experiment=self.exp )
+        self.instrument_elog = message_poster.message_poster_self( \
+                'NEH', self.instrument.upper()+' Instrument')
+        self.exp_elog = message_poster.message_poster_self( \
+                self.instrument.upper(), experiment=self.exp )
 
     def get_data_source(self, *args, **kwargs):
         """Data source used in loading psana. 
@@ -853,6 +742,9 @@ class psdata(object):
           Need to check if exp and run number are valid and if h5 data is available.
 
         """
+        if kwargs.get('exp',None) is not self.exp:
+            self.xtc_dir = None
+
         self.set_exp_defaults(**kwargs)
 #        if self.get_kwarg('camrecord'):
 #            host = os.uname()[1]
@@ -867,9 +759,13 @@ class psdata(object):
             self.xtc_dir = "/reg/d/cameras/{:}/daq/xtc".format(host)
             print self.xtc_dir
 
-        if not self.xtc_dir:
+        if self.xtc_dir:
+            default_dir = True
+        else:
             self.xtc_dir = "/reg/d/psdm/{instrument}/{exp}/xtc".format(
                                 instrument=self.instrument,exp=self.exp)
+            default_dir = True
+        
         if not self.h5_dir:
             self.h5_dir = "/reg/d/psdm/{instrument}/{exp}/hdf5".format(
                                 instrument=self.instrument,exp=self.exp)
@@ -908,7 +804,7 @@ class psdata(object):
                     elif self.indexed:
                         data_source += ":idx"
                     
-                    if self.xtc_dir and not self.h5:
+                    if self.xtc_dir and not default_dir and not self.h5:
                         data_source += ":dir={:}".format(self.xtc_dir)
                 except:
                     data_source = None
@@ -945,31 +841,23 @@ class psdata(object):
                                 self._device_sets[det] = {'pvs': {}}
                             self._device_sets[det]['pvs'][attr] = item
         else:
-            print 'load_epics_dict exception:  epics_dir specified to load epics_file = ',epics_file
-
-
-#        alias_dict = {}
-#        for alias in self.ds.env().epicsStore().aliases():
-#            base = alias.split('_')[0]
-#            attr = alias.lstrip(base).lstrip('_')
-#            if base not in alias_dict:
-#                alias_dict[base] = {}
-#            alias_dict[base][attr] = self.ds.env().epicsStore().pvName(alias)
-#
+            print 'load_epics_dict exception:  ' \
+                 +'epics_dir specified to load epics_file = ',epics_file
 
     @property
     def runs(self):
         """Experiment run information from MySQL database and xtc directory.
         """
-        runs_list =  experiment_info.experiment_runs(self.instrument.upper(),self.exp)
-#        runs_dict = {}
-        for item in runs_list:
-            runnum = item['num']
-            item['xtc_files'] = glob('{:}/*-r{:04d}*.xtc'.format(
-                                    self.xtc_dir,runnum))                        
-            item['h5_files'] = glob('{:}/*-r{:04d}*.h5'.format(
-                                    self.h5_dir,runnum))                        
-#            runs_dict[runnum] = item
+        if experiment_info.name2id(self.exp):
+            runs_list =  experiment_info.experiment_runs(self.instrument.upper(),self.exp)
+            for item in runs_list:
+                runnum = item['num']
+                item['xtc_files'] = glob('{:}/*-r{:04d}*.xtc'.format(
+                                        self.xtc_dir,runnum))                        
+                item['h5_files'] = glob('{:}/*-r{:04d}*.h5'.format(
+                                        self.h5_dir,runnum))                        
+        else:
+            runs_list = []
 
         return runs_list
 
@@ -1007,9 +895,17 @@ class psdata(object):
                 else:
                     h5 = ''
                 
-                dtime = item['end_time_unix'] - item['begin_time_unix']
-                dmin = dtime/60
-                dsec = dtime % 60
+                begin_time = item['begin_time_unix']
+                end_time = item['end_time_unix'] 
+                if end_time:
+                    dtime = end_time - begin_time
+                    flag = ' '
+                else:
+                    dtime = time.time() - begin_time
+                    flag = '*'
+
+                dmin = int(dtime/60)
+                dsec = int(dtime % 60)
                 if dmin > 0:
                     dtstr = '{:4}m {:02}s'.format(dmin,dsec)
                 else:
@@ -1022,16 +918,30 @@ class psdata(object):
                     print '{:7} {:10} {:8} {:>10} {:3} {:2}'.format(run,
                                         datestr, timestr, dtstr, xtc, h5)
 
+                if flag in '*':
+                    print '* Currently Acquiring Data for Run {:}'.format(run)
+
+#    @property
+#    def open_files(self, run=None):
+#        """Return a list of files created (by the DAQ system).  
+#           Current run if no run is specified.
+#        """
+#        return experiment_info.get_open_files(self.exper_id,run)
+
     def load_run_summary(self):
         """Load MySQL database experiment run summary information into a dictionary.
         """
         vrun_attrs = {}
+        print 'Loading summary of {:} runs for {:} from SQL database'.format( \
+                len(self.runs),self.exp)
+        print 'Estimate loading time ~{:} sec'.format(len(self.runs)/4)
         for run in range(1,self.runs[-1]['num']+1):
             run_attr = experiment_info.run_attributes(self.instrument,self.exp,run)
             for a in run_attr:
                 if a['name'] not in vrun_attrs:
                     vrun_attrs[a['name']] = {'class': a['class'], 'desc': a['descr'], 
-                                             'type': a['type'], 'val': [None for i in range(1,run)]} 
+                                             'type': a['type'], 'val': 
+                                             [None for i in range(1,run)]} 
                 vrun_attrs[a['name']]['val'].append(a['val'])
         self.run_summary = vrun_attrs
 
@@ -1052,33 +962,31 @@ class psdata(object):
 
         if data_source:
             try:
+                if self.cfg:
+                    psana.SetConfigFile(self.cfg)
                 self.ds = psana.DataSource(data_source)
                 _source_attrs = ['ds','events','evt']
                 self.events = self.ds.events()
                 self.configStore = PsanaDictify(self.ds.env().configStore())
+                if 'no_epics_aliases' not in kwargs or kwargs['no_epics_aliases'] is False:
+                    print 'Adding epics aliases to device sets'
+                    self.add_aliases_to_device_sets()
                 self.ievent = 0
                 if self.get_kwarg('nstart'):
                     for i in range(self.get_kwarg('nstart')-1),:
                         self.next_event()
-                if 'no_epics_aliases' not in kwargs or kwargs['no_epics_aliases'] is False:
-                    print 'Adding epics aliases to device sets'
-                    self.add_aliases_to_device_sets()
-#                for det in self._device_sets:
-#                    self.add_detector(det)
             except:
                 print 'Failed to load data source "{:}"'.format(data_source)
         else:
-#            print 'No valid data source from which to load data'
             if len(self.runs) > 0:
-                print 'WARNING:  No xtc files for {exp} available in {xtc_dir}'.format(
-                            exp=self.exp,xtc_dir=self.xtc_dir)
+                print 'WARNING:  No xtc files for {:} available in {:}'.format(
+                            self.exp,self.xtc_dir)
                 print 'Either set xtc_dir to a valid directory or restore files' 
                 print '  through the Data Manager:'
-                print 'https://pswww.slac.stanford.edu/apps/portal/index.php?exper_id={:}'.format(
-                        self.exper_id)
+                pswww_portal = 'https://pswww.slac.stanford.edu/apps/portal/index'
+                print pswww_portal+'.php?exper_id={:}'.format(self.exper_id)
             else:
                 print 'No runs taken for this experiment'
-
 
     def add_aliases_to_device_sets(self):
         """add epicsStore aliases to _device_sets. 
@@ -1112,15 +1020,26 @@ class psdata(object):
         return alias_dict
 
     def add_detector(self, det, module=None, path=None, empty=False, 
-                     device=None, **kwargs):
+                     device=None, pvs=None, desc=None, **kwargs):
         """Add a detector module and update _device_sets configuration.
            Overwrites any existing detector module.
+           Optionally add a dictionary of pvs with aliases.
         """
         initialized = False
 
-        if empty:
-            print 'Creating an empty Detector class ', det
-            self._device_sets[det] = {'desc': 'Empty Detector Class'}
+        if empty or pvs:
+            print 'Creating a Detector class ', det
+            if not desc:
+                desc = 'Empty Detector Class'
+            self._device_sets[det] = {'desc': desc}
+            if pvs:
+                self._device_sets[det]['pvs'] = {}
+                for alias, pv in pvs.items():
+                    pvbase = pv.rsplit('.')[0] 
+                    attr = '_'.join([det, alias.lstrip(det).lstrip('_')])
+                    self.add_pv(pvbase, attr)
+                    if self._kwargs.get('epics_live'):
+                        self.add_live_pv(pvbase)
 
         if det in self._device_sets:
             det_dict = self._device_sets[det]
@@ -1229,68 +1148,50 @@ class psdata(object):
         else:
             print 'ERROR:  Need to add ',det,' information to _device_sets.'
 
-    def load_evt_data(self,det_list=None):
-        """Returns dictionary of data functions in all types in current event.
-           If evt_keys dictionary provided only load data from thoses
-           event keys.
-        """
-        if not det_list:
-            det_list = list(set([self._det_aliases[evt_key['det_key']] 
-                                 for evt_key in self._evt_keys]))
-        for evt_key in self._evt_keys:
-            if self._det_aliases[evt_key['det_key']] in det_list:
-                src = evt_key['evt_key']
-                evt_data = self.evt.get(src.type(), src.src(), src.key())
-                type_data = {}
-                for attr in evt_key['data']:
-                    value = getattr(evt_data,attr)
-                    type_data[attr] = value
-                evt_key['data'] = type_data
+#    def get_evt_data(self,det_list=None):
+#        """Returns dictionary of data results.
+#           If evt_keys dictionary provided only load data from thoses
+#           event keys.
+#           Name mangle and return as pandas series.
+#        """
+#        data = {} 
+#        if not det_list:
+#            det_list = list(set([self._det_aliases[evt_key['det_key']] 
+#                                 for evt_key in self._evt_keys]))
+#        for evt_key in self._evt_keys:
+#            det_key = evt_key['det_key']
+#            det_name = self._det_aliases[det_key]
+#            if det_name in det_list:
+##                if det_name not in data:
+##                    data[det_name] = {}
+#                for attr in evt_key['data']:
+#                    value = evt_key['data'][attr]
+#                    try:
+#                        value = value()
+#                    except:
+#                        pass
+#                    if hasattr(value,'__func__'):
+#                        try:
+#                            value = value()
+#                        except:
+#                            pass
+#                    data['__'.join([det_name,attr])] = value
+##                    data[det_name][attr] = value
+#
+##        return data 
+#        return pd.Series(data) 
 
-    def get_evt_data(self,det_list=None):
-        """Returns dictionary of data results.
-           If evt_keys dictionary provided only load data from thoses
-           event keys.
-           Name mangle and return as pandas series.
-        """
-        data = {} 
-        if not det_list:
-            det_list = list(set([self._det_aliases[evt_key['det_key']] 
-                                 for evt_key in self._evt_keys]))
-        for evt_key in self._evt_keys:
-            det_key = evt_key['det_key']
-            det_name = self._det_aliases[det_key]
-            if det_name in det_list:
-#                if det_name not in data:
-#                    data[det_name] = {}
-                for attr in evt_key['data']:
-                    value = evt_key['data'][attr]
-                    try:
-                        value = value()
-                    except:
-                        pass
-                    if hasattr(value,'__func__'):
-                        try:
-                            value = value()
-                        except:
-                            pass
-                    data['__'.join([det_name,attr])] = value
-#                    data[det_name][attr] = value
-
-#        return data 
-        return pd.Series(data) 
-
-    def get_events(self,nevents,**kwargs):
-        """Get Number of specified events and return as Pandas DataFrame.
-        """
-        vdata = []
-        for i in range(0,nevents):
-            if i % 100 == 99:
-                print 'Getting Event',i+1
-            vdata.append(self.get_evt_data(**kwargs))
-            self.next_event()
-
-        return pd.DataFrame(vdata) 
+#    def get_events(self,nevents,**kwargs):
+#        """Get Number of specified events and return as Pandas DataFrame.
+#        """
+#        vdata = []
+#        for i in range(0,nevents):
+#            if i % 100 == 99:
+#                print 'Getting Event',i+1
+#            vdata.append(self.get_evt_data(**kwargs))
+#            self.next_event()
+#
+#        return pd.DataFrame(vdata) 
 
     def next_run(self):
         """Shortcut to load next run for same experiment.
@@ -1306,35 +1207,17 @@ class psdata(object):
                 if hasattr(self.EventId,'time'):
                     self._evt_time_last = self.EventId.time
             
-            self.evt = self.events.next()
-            self._evt_keys = [get_evt_keys(key) for key in self.evt.keys() 
-                              if key.type()]
-            for evt_key in self._evt_keys:
-                if evt_key['det_key'] not in self._det_aliases:
-                    det_key = evt_key['det_key']
-                    if 'alias' in evt_key and evt_key['alias']:
-                        det = evt_key['alias'].replace('-','_')
-                    else:
-                        det = det_key
-                    self._det_aliases[det_key] = det
-                    self._det_list.append(det)
-                    det_info = {attr: val for attr,val in evt_key.items()
-                                if attr in ['detName','detId','det_key',
-                                            'devName','devId','typeName',
-                                            'alias']}
+            self.evt = PsanaDictify(self.events.next())
+            for det, key_dict in self.evt._keys_dict.items():
+                if det not in self._det_aliases.values():
+                    det_key = key_dict['det']['det_key']
                     if det not in self._device_sets:
                         self._device_sets[det] = {}
-                    self._device_sets[det]['desc'] = det 
-                    self._device_sets[det]['det'] = det_info
-                    self._device_sets[det]['device'] = evt_key['device']
+                    self._device_sets[det].update({'det': key_dict['det']})
+                    self._det_aliases[det_key] = det
+                    self._det_list.append(det)
                     print 'adding', det
                     self.add_detector(det)
-
-            self._evt_dets = [self._det_aliases[evt_key['det_key']] 
-                              for evt_key in self._evt_keys]
-# keeping loading of evt data separate function from next event for now
-# to potentially switch to dynamic loading if desired in future.
-            self.load_evt_data()
 
             if hasattr(self, 'EventId'): 
                 if hasattr(self.EventId,'run'):
@@ -1367,12 +1250,12 @@ class psdata(object):
         for name, psmon_args in self._psplots.items():
             try:
                 det_class = getattr(self,psmon_args['det'])
-#                if getattr(det_class,'is_in_keys'):
-                psmon_fnc = psmon_args['plot_function'](psmon_args['ts'],
-                                psmon_args['title'],
-                                getattr(det_class,psmon_args['attr']),
-                                **psmon_args['kwargs'])
-                publish.send(name,psmon_fnc)
+                if getattr(det_class,'is_in_keys'):
+                    psmon_fnc = psmon_args['plot_function'](psmon_args['ts'],
+                                    psmon_args['title'],
+                                    getattr(det_class,psmon_args['attr']),
+                                    **psmon_args['kwargs'])
+                    publish.send(name,psmon_fnc)
             except:
                 pass
 
@@ -1479,104 +1362,6 @@ class psdata(object):
                     print '{:18s} {:>10} {:6} {:>14}'.format(alias, value, unit, name)
                 except:
                     print '{:18s} {:10} {:6} {:>14}'.format(alias, 'NA', unit, name)
-
-    def get_det_attr(self, alias, attr):
-        """Get data attribute of detector alias. 
-        """
-        if alias in self._det_aliases.values():
-            det_key = (key for key,value in self._det_aliases.items() 
-                       if value==alias).next() 
-        else:
-            det_key = alias
-
-        return self.get_det_key_attr(det_key, attr)
-
-    def show_det_key_info(self, det_keys, attrs=None):
-        """Show table of detector info.
-        """
-        if not isinstance(det_keys,list):
-            det_keys = [det_keys]
-        for det_key in det_keys:
-            if det_key in self._device_sets:
-                if 'det' in self._device_sets[det_key]:
-                    if 'det_key' in self._device_sets[det_key]['det']:
-                        det_key = self._device_sets[det_key]['det']['det_key']
-            if det_key: 
-                if hasattr(self, det_key):
-                    det_class = getattr(self, det_key)
-                    if not attrs:
-                        attrs = det_class.data_attrs 
-                        for attr in det_class._user_funcs.keys():
-                            attrs.append(attr)
-#                    print self._det_aliases[det_key], det_key
-                    user_funcs = getattr(det_class, '_user_funcs')
-                    if user_funcs:
-                        items = sorted(user_funcs.items(), key=operator.itemgetter(0))
-                        for attr,func in items:
-                            if attr in attrs:
-                                value = getattr(det_class, 'get_function')(attr)
-                                if hasattr(value,'show_info'):
-                                    value.show_info()
-                                else:
-                                    unit = ''
-                                    doc = ''
-                                    try:
-                                        if hasattr(value,'mean'):
-                                            value = '<{:.4}>'.format(value.mean())
-                                        elif 'no doc' in func.__doc__:
-                                            pass
-                                        else:
-                                            doc = func.__doc__.split('\n')[0].lstrip(' ')
-                                            unit = get_unit_from_doc(doc)
-                                            value = '{:.4}'.format(value)
-                                    except:
-                                        pass
-                                    print '{:18s} {:>10} {:6} {:}'.format(attr, value, unit, doc)
-                for evt_key in self._evt_keys:
-                    if evt_key['det_key'] in det_key and 'data' in evt_key:
-                        items = sorted(evt_key['data'].items(), key=operator.itemgetter(0))
-                        for attr,func in items:
-                            if attr in attrs:
-                                doc = ''
-                                unit = ''
-                                value = func
-                                try:
-                                    value = value()
-                                except:
-                                    pass
-                                if hasattr(value,'__func__'):
-                                    value = value.__str__()
-                                else:
-                                    try:
-                                        if hasattr(value,'mean'):
-                                            value = '<{:.4}>'.format(value.mean())
-                                        else:
-                                            doc = func.__doc__.split('\n')[-1].lstrip(' ')
-                                            value = '{:.4}'.format(value)
-                                            unit = get_unit_from_doc(doc)
-                                    except:
-                                        pass
-                                print '{:18s} {:>10} {:6} {:}'.format(attr, value, unit, doc)
-
-    def get_det_key_attr(self, det_key, attr):
-        """Get data attribute of det_key detector key definition.
-           Use get_det_attr if using detector aliases.
-        """
-        for evt_key in [d for d in self._evt_keys if d['det_key'] == det_key]:
-            if attr in evt_key['data']:
-    # Need smarter way to recognize which functions cannot be evaluated such as 
-    # quads in psana.CsPad.DataV2 
-                value = evt_key['data'][attr]
-                try:
-                    value = value()
-                except:
-                    pass
-                if hasattr(value,'__func__'):
-                    try:
-                        value = value()
-                    except:
-                        pass
-                return value
 
     @property
     def _pv_dict(self):
@@ -1685,7 +1470,6 @@ class Detector(object):
     _data_funcs = {}
     _pv_funcs = {}
     _user_aliases = {}
-    _det = None
     _det_key = None
     _name = None
     _module_attrs = []
@@ -1697,10 +1481,8 @@ class Detector(object):
         self._data = data
         self._name = det
         if det in data._device_sets:
-#            self._det = data._device_sets[det]
             if 'det' in self._det:
                 self._det_key = self._det['det']['det_key']
-#                self.config = getattr(self._data.configStore,self._name)
             if 'desc' in self._det:
                 self.desc = self._det['desc']
             else:
@@ -1715,7 +1497,8 @@ class Detector(object):
             if 'epicsStore' in self._det:
                 for attr,pv in self._det['epicsStore'].items():
                     self._pvs[attr] = EpicsStore(data,pv)
-           
+                    print 'adding epicsStore', attr
+
 #            device = None
 #            if 'device' in data._device_sets[det]:
 #                device = data._device_sets[det]['device']
@@ -1731,20 +1514,6 @@ class Detector(object):
     @property
     def _det(self):
         return self._data._device_sets[self._name]
-
-    @property
-    def data_attrs(self):
-        """Returns data attributes for all data types in current event.  
-        """
-        attrs = []
-        if 'det' in self._det:
-            for evt_key in self._data._evt_keys:
-                if evt_key['det_key'] == self._det['det']['det_key']:
-                    for attr in evt_key['data']:
-                        attrs.append(attr)
-#        for attr in self._user_funcs.keys():
-#            attrs.append(attr)
-        return attrs
 
     @property
     def config(self):
@@ -1870,7 +1639,8 @@ class Detector(object):
                                                  'nevents': nevents,
                                                  'kwargs': kwargs} 
         else:
-            print 'Error adding event function:  {:} has no function named {:}'.format(self._name, attr)
+            print 'Error adding event function:  {:} has no function ' \
+                  'named {:}'.format(self._name, attr)
 
     def add_psplot(self, attr, local=True, **kwargs):
         """Update psplot 
@@ -1912,7 +1682,8 @@ class Detector(object):
         if not plot_error:
             if plot_type is 'Image':
                 plt_opts = ['xlabel', 'ylabel', 'aspect_ratio', 'aspect_lock']
-                plt_kwargs = {key: item for key, item in kwargs.items() if key in plt_opts}
+                plt_kwargs = {key: item for key, item in kwargs.items() \
+                              if key in plt_opts}
                 plt_args = {'det': self._name,
                             'attr': attr,  
                             'name': name,
@@ -1950,7 +1721,8 @@ class Detector(object):
 #            if name in self._data._psplots[name]:
             print 'psmon plot added -- use the following to view: '
             print '--> psplot -s {:} -p 12301 {:}'.format(os.uname()[1], name)
-            print 'WARNING -- see notice when adding for -p PORT specification if default PORT=12301 not available'
+            print 'WARNING -- see notice when adding for -p PORT specification'
+            print '           if default PORT=12301 not available'
             self._data._psplots[name] = plt_args
             if not self._data._publish:
                 publish.init()
@@ -1974,6 +1746,7 @@ class Detector(object):
     def show_info(self, attrs=None,
                         next_event=False, 
                         nevents=1, monitor=False, sleep=0.2,
+                        is_in_keys=False,
                         no_epics_live=False,
                         no_epicsStore=False,
                         no_data=False,
@@ -1987,17 +1760,28 @@ class Detector(object):
                 if ievent > 0:
                     time.sleep(sleep)
                     self._data.next_event()
+
                 elif next_event or monitor:
                     self._data.next_event()
+                
+                while is_in_keys and not self.is_in_keys:
+                    self._data.next_event()
+                    ievent += 1
+                
                 ievent += 1
-                if self._det_key and not no_data and not self._data._no_data:
-                    print '='*72
-                    print '{:}, Run {:}, Event {:}'.format(self._data.exp, self._data.run, ievent) 
+                print ''
+                if 'det' in self._det and not no_data and not self._data._no_data:
+                    print '='*80
+                    print '{:}, Run {:}, Event {:}'.format(self._data.exp, \
+                           self._data.run, ievent) 
                     try:
-                        EventTime = time.strftime('%H:%M:%S',time.localtime(self._data.EventId.time[0]))
+                        EventTime = time.strftime('%H:%M:%S',
+                                time.localtime(self._data.EventId.time[0]))
                         EventTime += '.{:04}'.format(int(self._data.EventId.time[1]/1e5))
-                        DeltaTime = (self._data.EventId.time[0]-self._data._evt_time_last[0]) \
-                                   +(self._data.EventId.time[1]-self._data._evt_time_last[1])/1.e9
+                        DeltaTime = (self._data.EventId.time[0] \
+                                     -self._data._evt_time_last[0]) \
+                                   +(self._data.EventId.time[1] \
+                                     -self._data._evt_time_last[1])/1.e9
                         if DeltaTime > 0:
                             Rate = '{:8.1f} Hz'.format(1./DeltaTime)
                             DeltaTime = '{:8.4f}'.format(DeltaTime)
@@ -2014,16 +1798,16 @@ class Detector(object):
                     except:
                         eventCodes = ''
 
-                    print '-'*72
+                    print '-'*80
                     print '{:} {:} {:} '.format(self.desc, EventTime, Rate), eventCodes
                     if config:
                         self.config.show_info()
-                    print '-'*72
-                    self._data.show_det_key_info(self._det_key, attrs=attrs, *args, **kwargs)
+                        print '-'*80
+                    if self._detector:
+                        self._detector.show_info(attrs=attrs)
 
-        #        for attr in self._module_attrs:
-
-                if not no_epics_live and self._data.get_kwarg('epics_live') and 'pvs' in self._det:
+                if not no_epics_live and self._data._kwargs.get('epics_live') \
+                        and 'pvs' in self._det:
                     live_pv_attrs = list(sorted(self._det['pvs'].keys()))
                     if attrs:
                         live_pv_attrs = [attr for attr in live_pv_attrs if attr in attrs] 
@@ -2034,10 +1818,12 @@ class Detector(object):
                         pvs = [self._det['pvs'][attr]['base'] for attr in live_pv_attrs]
                         self._data.show_epics_live_info(pvs,aliases=live_pv_attrs)
 
-                if not no_epicsStore and not self._data._no_epicsStore and 'epicsStore' in self._det:
+                if not no_epicsStore and not self._data._no_epicsStore \
+                        and 'epicsStore' in self._det:
                     epics_store_pvs = list(sorted(self._det['epicsStore'].keys())) 
                     if attrs:
-                        epics_store_pvs = [attr for attr in epics_store_pvs if attr in attrs] 
+                        epics_store_pvs = [attr for attr in epics_store_pvs \
+                                           if attr in attrs] 
                     if epics_store_pvs:
                         print '-'*72
                         print self.desc+': Epics Store PVs'
@@ -2058,23 +1844,12 @@ class Detector(object):
                 
         except KeyboardInterrupt:
             pass
-                
-
-    @property
-    def _evt_keys(self):
-        """Return psana evt_keys of Detector for current event.  
-           Returns empty list for Detector class with only epics pv's and no det_key.
-        """
-        if self._det_key:
-            return [d for d in self._data._evt_keys if d['det_key'] == self._det_key]
-        else:
-            return []
-
-    @property
+    
+    @property 
     def is_in_keys(self):
+        """Return True if detector is in evt.keys().
         """
-        """
-        if self._evt_keys:
+        if self._detector:
             return True
         else:
             return False
@@ -2087,7 +1862,8 @@ class Detector(object):
 
     def add_live_pv(self, attr, pv=None):
         """Add a live epics pv. 
-           pv keyward only needs to be set if the specified attr is not in the _det['pvs'] dictionary.
+           pv keyward only needs to be set if the specified attr 
+           is not in the _det['pvs'] dictionary.
         """
         if self._data.get_kwarg('epics_live'):
             if attr in self._det['pvs']:
@@ -2098,11 +1874,9 @@ class Detector(object):
                     attr = pvbase.replace(':','_')
                 else:
                     pvbase = pv.split('.')[0]
-#                self._det['pvs'][attr] = {'base': pvbase}
             alias = '_'.join([self._name, attr])
             self._data.add_pv(pvbase, alias)
             self._data.add_live_pv(pvbase)
-#            self._data._epics_devices[pvbase] = lcls_devices.get_live_pv(pvbase)
         else:
             print 'WARNING: Epics is not live.' 
             print '         Must be on appropriate machine and epics_live set to True.'
@@ -2129,7 +1903,8 @@ class Detector(object):
                 else:
                     attrs = epics_device._info_attrs
                 
-                pv_dict[pv] = {attr: epics_device.get(attr, as_string=True) for attr in attrs}
+                pv_dict[pv] = {attr: epics_device.get(attr, as_string=True) \
+                               for attr in attrs}
 
             for pvtype, pvs in pv_types.items():
                 attrs = list(sorted(set(pv_dict[pvs[0]].keys())))
@@ -2177,6 +1952,30 @@ class Detector(object):
             else: 
                 return self._pvs[attr]
 
+    @property
+    def _det_attrs(self):
+        """Detector attributes.  
+           Plan to switch to getting them from config instead of evt data.
+        """
+        if 'det' in self._det and self._detector:
+            return self._detector._attr_type
+        else:
+            return {}
+
+    @property
+    def _detector(self):
+        """Get Detector data from PsanaDictify Class.
+        """
+        return self._data.evt._get_det_dict(self._name)
+
+    def _get_det_attr(self, attr):
+        """Get Detector attribute from PsanaDictify Class.
+        """
+        if attr in self._det_attrs:
+            return getattr(self._detector, attr)
+        else:
+            return None
+
     def __getattr__(self, attr):
         """Return detector attribues from detector functions and  pv aliases.
            Detector functions will be automatically defined for each data type.
@@ -2184,20 +1983,20 @@ class Detector(object):
         if attr == '_evt_keys':
             print 'Restricted attribute!!!  Returning:  None'
             return None
-        
-        if attr in self.data_attrs:
-            return self._data.get_det_key_attr(self._det_key,attr)
-        
-        if attr in self._data_funcs:
-            return eval(self._data_funcs[attr]) 
-        
+      
+        if self._det.get('det'):
+            if attr in self._det_attrs:
+                return self._get_det_attr(attr)
+
+            if attr in self._data_funcs:
+                return eval(self._data_funcs[attr]) 
+            
         if attr in self._det['pvs']:
             return self.get_epics_pv(attr)
             pvbase = self._det['pvs'][attr]['base']
         
         if 'epicsStore' in self._det and attr in self._det['epicsStore']:
             return self._pvs[attr]
-#                return self.get_epicsStore(pvbase)
         
         if attr in self._pv_funcs:
             return eval(self._pv_funcs[attr]) 
@@ -2207,7 +2006,7 @@ class Detector(object):
 
     def __dir__(self):
         # As noted in epics.device -- there's no cleaner method to do this until Python 3.3
-        all_attrs = set(self.data_attrs + 
+        all_attrs = set(self._det_attrs.keys() +
                         self._det['pvs'].keys() +
                         self._pvs.keys() +
                         self._data_funcs.keys() +
@@ -2243,7 +2042,7 @@ class EpicsStore(object):
             except:
                 print 'EpicsStore not available to load', base
 
-    def __get_pv_attr(self, attr):
+    def _get_pv_attr(self, attr):
         """Retrieve PV from epics store.
            Currently only retrieves the readback value (RBV) of motors.
         """
@@ -2261,10 +2060,10 @@ class EpicsStore(object):
 
     def __getattr__(self,attr):
         if attr in self._attrs:
-            return self.__get_pv_attr(attr)
+            return self._get_pv_attr(attr)
         
 #    def __repr__(self):
-#        self.__get_pv_attr('value')
+#        '{:}'.format(self._get_pv_attr('value'))
 
     def __dir__(self):
         all_attrs = set(self._attrs.keys() + 
@@ -2351,6 +2150,8 @@ def initArgs():
                         help='Instrument')
     parser.add_argument("-s", "--station", type=int, 
                         help='Station')
+    parser.add_argument("--cfg", type=str, 
+                        help='psana cfg config file')
     parser.add_argument("--h5", action="store_true", 
                         help='Use hdf5 data instead of xtc')
     parser.add_argument("--xtc_dir", type=str, 
