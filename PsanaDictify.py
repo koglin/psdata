@@ -71,10 +71,10 @@ class PsanaDictify(object):
                     else:
                         det_key = '_'.join([src.detName(),str(src.detId()),
                                             src.devName(),str(src.devId())])
-                    src_attrs = ['detName','detId','devName','devId']
+                    src_attrs = ['__str__','detName','detId','devName','devId']
                 elif hasattr(src,'typeName'):
                     det_key = '_'.join([src.typeName(),str(src.type())])
-                    src_attrs = ['typeName']
+                    src_attrs = ['__str__','typeName']
                 else:
                     src_attrs = []
                     det_key = None
@@ -151,14 +151,18 @@ class PsanaDictify(object):
                 if not alias:
                     alias = det_key
 
-                if det_key in keys_dict:
+                if alias:
+                    alias = alias.replace('-','_')
+
+                if alias in keys_dict:
                     det_dict = keys_dict[alias]['det']
                 else:
                     keys_dict[alias] = {}
                     det_dict = {'alias': alias,
                                 'det_key': det_key,
                                 'attr_type': {},
-                                'type_list': [], 
+                                'type_list': [],
+                                'types': {},
                                 'duplicate_attrs': []}
                     for attr in src_attrs:
                         det_dict[attr] = getattr(src,attr)()
@@ -167,8 +171,10 @@ class PsanaDictify(object):
                                      evt_key.src(), 
                                      evt_key.key())
                 det_dict['type_list'].append(device)
+                det_dict['types'][device] = evt_key.type()
                 if key_dict.get('data_key'):
-                    key_dict['attrs'] = {key_dict['data_key']: evt_funcs}
+                    attr = key_dict['data_key']
+                    key_dict['attrs'] = {attr: evt_funcs}
                     if attr in det_dict['attr_type']:
                         det_dict['duplicate_attrs'].append(attr)
                     det_dict['attr_type'][attr] = device
@@ -208,7 +214,8 @@ class DetDictify(object):
             self._attr_type = {}
         self._attrs = self._attr_type.keys()
 
-        self._types = {typ: TypeDictify(keys_dict, det, typ) for typ in keys_dict[det]['det']['type_list']}
+        self._types = {typ: TypeDictify(keys_dict, det, typ) \
+                       for typ in keys_dict[det]['det']['type_list']}
 
     def get_det_type(self, type):
         return self._types.get(type)
@@ -337,8 +344,14 @@ def get_unit_from_doc(doc):
     try:
         unit = '{:}'.format(doc.rsplit(' in ')[-1])
         unit = unit.rstrip('.').rstrip(',').rsplit(' ')[0].rstrip('.').rstrip(',')
+        if unit in 'Value':
+            unit = '{:}'.format(doc.rsplit('converted to ')[-1].rstrip('.'))
+        
+        if unit.endswith('(') or unit in ['long', 'all', 'setup', 'given']:
+            unit = ''
+    
     except:
-        unit = None
+        unit = ''
     return unit
 
 def func_dict(attr, func):

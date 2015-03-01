@@ -19,7 +19,8 @@ record_dict = {
             'device_type':            ('DTYP', 'Device type'),
             'record_type':            ('RTYP', 'Record Type'),
             },
-        'init':  ['NAME', 'DESC', 'VAL', 'EGU', 'PREC', 'RTYP', 'DTYP']
+        'init':  ['NAME', 'DESC', 'VAL', 'EGU', 'PREC', 'RTYP', 'DTYP'],
+        'config': ['DESC', 'EGU', 'PREC', 'DTYP']
         },
     'bo': {
         'reference': 'http://www.aps.anl.gov/epics/EpicsDocumentation/AppDevManuals/RecordRef/Recordref-12.html',
@@ -38,7 +39,8 @@ record_dict = {
             'record_type':            ('RTYP', 'Record Type'),
             'raw_value':              ('RVAL', 'Raw Value  '),
             },
-        'init':  ['NAME', 'DESC', 'VAL', 'RVAL', 'PREC', 'RTYP', 'DTYP']
+        'init':  ['NAME', 'DESC', 'VAL', 'RVAL', 'PREC', 'RTYP', 'DTYP'],
+        'config': ['DESC', 'DTYP']
         },
     'bi': {
 #        'description': 'The normal use for this record type is to obtain a binary value of 0 or 1. 
@@ -55,7 +57,8 @@ record_dict = {
             'record_type':            ('RTYP', 'Record Type'),
             'raw_value':              ('RVAL', 'Raw Value  '),
             },
-        'init':  ['NAME', 'DESC', 'VAL', 'RVAL', 'PREC', 'RTYP', 'DTYP']
+        'init':  ['NAME', 'DESC', 'VAL', 'RVAL', 'PREC', 'RTYP', 'DTYP'],
+        'config': ['DESC', 'DTYP']
         },
     'ao': {
 #        'description': 'The normal use for this record type is to output values to digital-analog 
@@ -78,7 +81,8 @@ record_dict = {
             'raw_value':              ('RVAL', 'Raw Value  '),
             'raw_offset':             ('ROFF', 'Raw Offset'),
             },
-        'init':  ['NAME', 'DESC', 'VAL', 'RVAL', 'EGU', 'PREC', 'RTYP', 'DTYP']
+        'init':  ['NAME', 'DESC', 'VAL', 'RVAL', 'EGU', 'PREC', 'RTYP', 'DTYP'],
+        'config': ['DESC', 'EGU', 'PREC', 'DTYP']
         },
     'ai': {
 #        'description': 'The normal use for this record type is to obtain an analog value from 
@@ -113,7 +117,8 @@ record_dict = {
 #            'lsv':                    ('LSV', '??'),
 #            'hyst':                   ('HYST', '??'),
             },
-        'init':  ['NAME', 'DESC', 'VAL', 'RVAL', 'EGU', 'PREC', 'RTYP', 'DTYP']
+        'init':  ['NAME', 'DESC', 'VAL', 'RVAL', 'EGU', 'PREC', 'RTYP', 'DTYP'],
+        'config': ['DESC', 'EGU', 'PREC', 'DTYP']
         },
      'sel': {
         'description': 'Used for Vacuum devices',
@@ -128,7 +133,8 @@ record_dict = {
             'device_type':            ('DTYP', 'Device type'),
             'record_type':            ('RTYP', 'Record Type'),
             },
-        'init':  ['NAME', 'DESC', 'VAL', 'EGU', 'PREC', 'RTYP', 'DTYP']
+        'init':  ['NAME', 'DESC', 'VAL', 'EGU', 'PREC', 'RTYP', 'DTYP'],
+        'config': ['DESC', 'EGU', 'PREC', 'DTYP']
         },
      'longin': {
         'fields': {
@@ -139,7 +145,8 @@ record_dict = {
             'device_type':            ('DTYP', 'Device type'),
             'record_type':            ('RTYP', 'Record Type'),
             },
-        'init':  ['NAME', 'DESC', 'VAL', 'EGU', 'RTYP', 'DTYP']
+        'init':  ['NAME', 'DESC', 'VAL', 'EGU', 'RTYP', 'DTYP'],
+        'config': ['DESC', 'EGU', 'DTYP']
         },
      'longout': {
         'fields': {
@@ -150,7 +157,8 @@ record_dict = {
             'device_type':            ('DTYP', 'Device type'),
             'record_type':            ('RTYP', 'Record Type'),
             },
-        'init':  ['NAME', 'DESC', 'VAL', 'EGU', 'RTYP', 'DTYP']
+        'init':  ['NAME', 'DESC', 'VAL', 'EGU', 'RTYP', 'DTYP'],
+        'config': ['DESC', 'EGU', 'DTYP']
         },
      'sub': {
         'fields': {
@@ -161,7 +169,8 @@ record_dict = {
             'device_type':            ('DTYP', 'Device type'),
             'record_type':            ('RTYP', 'Record Type'),
             },
-        'init':  ['NAME', 'DESC', 'VAL', 'EGU', 'RTYP', 'DTYP']
+        'init':  ['NAME', 'DESC', 'VAL', 'EGU', 'RTYP', 'DTYP'],
+        'config': ['DESC', 'EGU', 'DTYP']
         },
      'longSub': {
         'fields': {
@@ -172,7 +181,8 @@ record_dict = {
             'device_type':            ('DTYP', 'Device type'),
             'record_type':            ('RTYP', 'Record Type'),
             },
-        'init':  ['NAME', 'DESC', 'VAL', 'EGU', 'RTYP', 'DTYP']
+        'init':  ['NAME', 'DESC', 'VAL', 'EGU', 'RTYP', 'DTYP'],
+        'config': ['DESC', 'EGU', 'DTYP']
         }
 }
 

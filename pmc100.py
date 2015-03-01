@@ -120,6 +120,7 @@ class Arcus(device.Device):
         'slew_speed':             ('VELO', 'Velocity (EGU/s) '),
         'version':                ('VERS', 'Code Version '),
         'record_type':            ('RTYP', 'Record Type'),
+        'device_type':            ('DTYP', 'Device Type'),
         'encoder':                ('ENCM', 'Encoder Factor'),
         'sl_status':              ('SLS',  'SL Status'),
         'pulse_polarity':         ('POL0', 'Pulse Polarity'),
@@ -150,6 +151,8 @@ class Arcus(device.Device):
 #       'tweak_forward':          ('TWF',  'Tweak motor Forward '),
 #       'tweak_reverse':          ('TWR',  'Tweak motor Reverse ')
     }
+
+    config = ['DESC','PREC','EGU','DTYP','VERS']
 
     _attr_tuple = {}
     _alias = {}

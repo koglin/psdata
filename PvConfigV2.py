@@ -1,0 +1,16 @@
+PvConfigV2 = {
+    'ims':     ['DESC', 'EGU', 'PREC', 'VERS', 'TYPE', 'PN', 'SN'],
+    'xps8p':   ['DESC', 'EGU', 'PREC', 'VERS', 'TYPE'],
+    'motor':   ['DESC', 'EGU', 'PREC', 'VERS'],
+    'pmc100':  ['DESC', 'EGU', 'PREC', 'VERS'],
+    'calc':    ['DESC', 'EGU', 'PREC'],
+    'sel':     ['DESC', 'EGU', 'PREC'],
+    'ai':      ['DESC', 'EGU', 'PREC'],
+    'ao':      ['DESC', 'EGU', 'PREC'],
+    'longSub': ['DESC', 'EGU'],
+    'longout': ['DESC', 'EGU'],
+    'longin':  ['DESC', 'EGU'],
+    'sub':     ['DESC', 'EGU'],
+    'bi':      ['DESC'],
+    'bo':      ['DESC'],
+}

@@ -513,11 +513,12 @@ class psdata(object):
     """
 
     _default_modules = {'device': {
-                            'EvrData': 'evr', 
+                            'Evr': 'evr', 
                             'Imp': 'imp',
 #                            'Acqiris': 'acqiris',
                             'Epix': 'epix100',
-                            'CsPad': 'cspad',
+                            'Cspad': 'cspad',
+                            'Tm6740': 'pim',
                             },
                         'det_key': {
                             'XrayTransportDiagnostic_0_Opal1000_0': 'xtcav_det',
@@ -569,6 +570,9 @@ class psdata(object):
         self._source_attrs = []
         self._evt_time_last = (0,0)
         self.ievent = 0
+        self._reloadOnLoadRun = False
+        self._reloadOnNextEvent = False
+        self.psana_cfg_dict = {}
 
 #        self._user_attrs = {}
 #        self._histograms = {}
@@ -612,14 +616,17 @@ class psdata(object):
         if not self.get_kwarg('noload'):
             self.load_run(*args, **kwargs)
             self._no_epicsStore = False
-
+    
         if self.ds and self.live:
             self.next_event()
         
-        if self.ds and not self._kwargs.get('epics_file') \
-                and not self._kwargs.get('no_epics_aliases'):
-            self.add_aliases_to_device_sets()
-            print 'Adding epics aliases to device sets'
+        if self.ds and self._reloadOnNextEvent:
+            self.next_event()
+                
+#        if self.ds and not self._kwargs.get('epics_file') \
+#                and not self._kwargs.get('no_epics_aliases'):
+#            self.add_aliases_to_device_sets()
+#            print 'Adding epics aliases to device sets'
 
         if not self.ds:
             self._no_epicsStore = True
@@ -949,7 +956,20 @@ class psdata(object):
 #        temp = {key: pd.Series(dat['val']) for key,dat in data.run_summary.items()}
 #        pd.DataFrame(temp,columns=['CXI:SC1:MMS:02.RBV'])
 
-    def load_run(self, *args, **kwargs):
+    def setOptions(self):
+        """Set psana cfg options from psana_cfg_dict.
+           these may be set by custom Detector classes added with add_module
+           in this case set _reloadOnLoadRun flag
+        """
+        psana_modules = ' '.join(self.psana_cfg_dict.keys())
+        self.cfg_setOptions = {'psana.modules': psana_modules}
+        for module, params in self.psana_cfg_dict.items():
+            for attr, val in params.items():
+                self.cfg_setOptions[module+'.'+attr] = val
+
+        psana.setOptions(self.cfg_setOptions)
+
+    def load_run(self, reload=False, *args, **kwargs):
         """Load run for experiment.
            Optionally pass 
         """
@@ -962,19 +982,28 @@ class psdata(object):
 
         if data_source:
             try:
-                if self.cfg:
+                if self.psana_cfg_dict:
+                    self.setOptions()
+                elif self.cfg:
+                    # if a cfg file is specified it will be loaded
+                    # however, the cfg_setOptions takes precidence
+                    # in future may try combind the two.
                     psana.SetConfigFile(self.cfg)
+                
                 self.ds = psana.DataSource(data_source)
                 _source_attrs = ['ds','events','evt']
                 self.events = self.ds.events()
                 self.configStore = PsanaDictify(self.ds.env().configStore())
-                if 'no_epics_aliases' not in kwargs or kwargs['no_epics_aliases'] is False:
+                if not reload and ('no_epics_aliases' not in kwargs 
+                                   or kwargs['no_epics_aliases'] is False):
                     print 'Adding epics aliases to device sets'
                     self.add_aliases_to_device_sets()
+                
                 self.ievent = 0
-                if self.get_kwarg('nstart'):
+                if not reload and self.get_kwarg('nstart'):
                     for i in range(self.get_kwarg('nstart')-1),:
                         self.next_event()
+                
             except:
                 print 'Failed to load data source "{:}"'.format(data_source)
         else:
@@ -987,6 +1016,10 @@ class psdata(object):
                 print pswww_portal+'.php?exper_id={:}'.format(self.exper_id)
             else:
                 print 'No runs taken for this experiment'
+
+        if self._reloadOnLoadRun:
+            self._reloadOnLoadRun = False
+            self.load_run(reload=True)
 
     def add_aliases_to_device_sets(self):
         """add epicsStore aliases to _device_sets. 
@@ -1061,22 +1094,21 @@ class psdata(object):
                           {module_name} to {module}'.format(
                            det=det,module=module,module_name=module_name)
                 else:
-                    self._device_sets[det]['module'] = {}
+                    det_dict['module'] = {}
                 
                 module_name = module
-                self._device_sets[det]['module']['name'] = module
-
-            if device:
-                self._device_sets[det]['device'] = device
-            else:
-                if 'device' in self._device_sets[det]:
-                    device = self._device_sets[det]['device']
+                det_dict['module']['name'] = module
 
             # Use defaults if not set by keyword or in device config
             if 'det' in det_dict and 'det_key' in det_dict['det']:
                 det_key = det_dict['det']['det_key']
             else:
                 det_key = None
+
+            if not device and det_dict.get('det') and det_dict['det'].get('devName'):
+                device = det_dict['det']['devName']
+
+            self._device_sets[det]['device'] = device
 
             if not module_name: 
                 if det_key and det_key in self._default_modules['det_key']:
@@ -1207,13 +1239,17 @@ class psdata(object):
                 if hasattr(self.EventId,'time'):
                     self._evt_time_last = self.EventId.time
             
+            if self._reloadOnNextEvent:
+                self.load_run(reload=True)
+                self._reloadOnNextEvent = False
+
             self.evt = PsanaDictify(self.events.next())
             for det, key_dict in self.evt._keys_dict.items():
+                if det not in self._device_sets:
+                    self._device_sets[det] = {}
+                self._device_sets[det].update({'det': key_dict['det']})
                 if det not in self._det_aliases.values():
                     det_key = key_dict['det']['det_key']
-                    if det not in self._device_sets:
-                        self._device_sets[det] = {}
-                    self._device_sets[det].update({'det': key_dict['det']})
                     self._det_aliases[det_key] = det
                     self._det_list.append(det)
                     print 'adding', det
@@ -1248,16 +1284,26 @@ class psdata(object):
 
     def psmon_publish(self):
         for name, psmon_args in self._psplots.items():
-            try:
+#            try:
+            if True:
                 det_class = getattr(self,psmon_args['det'])
                 if getattr(det_class,'is_in_keys'):
-                    psmon_fnc = psmon_args['plot_function'](psmon_args['ts'],
-                                    psmon_args['title'],
-                                    getattr(det_class,psmon_args['attr']),
-                                    **psmon_args['kwargs'])
+                    psplot_func = psmon_args['plot_function']
+                    if psplot_func is Image:
+                        psmon_fnc = psplot_func(psmon_args['ts'],
+                                        psmon_args['title'],
+                                        getattr(det_class,psmon_args['attr']),
+                                        **psmon_args['kwargs'])
+                    elif psplot_func is XYPlot:
+                        psmon_fnc = psplot_func(psmon_args['ts'],
+                                        psmon_args['title'],
+                                        psmon_args['xdata'],
+                                        getattr(det_class,psmon_args['attr']),
+                                        **psmon_args['kwargs'])
+
                     publish.send(name,psmon_fnc)
-            except:
-                pass
+#            except:
+#                pass
 
     def add_live_pv(self, pv):
         """Add live pv to _epics_devices.
@@ -1482,18 +1528,22 @@ class Detector(object):
         self._name = det
         if det in data._device_sets:
             if 'det' in self._det:
-                self._det_key = self._det['det']['det_key']
+                self._det_key = self._det['det']['det_key'] 
+
             if 'desc' in self._det:
                 self.desc = self._det['desc']
             else:
                 self.desc = self._name
+            
             if 'pvs' not in self._det:
                 self._det['pvs'] = {}
+            
             if data._no_epicsStore:
                 self._pvs = {attr: EpicsStore(data,val['base']) 
                              for attr, val in self._det['pvs'].items()}
             else:
                 self._pvs = {}
+            
             if 'epicsStore' in self._det:
                 for attr,pv in self._det['epicsStore'].items():
                     self._pvs[attr] = EpicsStore(data,pv)
@@ -1516,6 +1566,25 @@ class Detector(object):
         return self._data._device_sets[self._name]
 
     @property
+    def src(self):
+        """Psana data source.
+        """
+        if self._det.get('det'):
+            return self._det['det'].get('__str__')
+        else:
+            return None
+
+    @property
+    def types(self):
+        """Dictionary of Psana data types.
+           For some detectors there may be multiple types.  
+        """
+        if self._det.get('det'):
+            return self._det['det']['types']
+        else:
+            return None
+
+    @property
     def config(self):
         """ConfigStore data for detector.
         """
@@ -1523,6 +1592,24 @@ class Detector(object):
             return getattr(self._data.configStore, self._name)
         else:
             return None
+
+    def add_psana_options(self, cfg_dict):
+        """Add a psana config dictionary.
+        """
+        try:
+            self._data.psana_cfg_dict.update(cfg_dict)
+            self._data._reloadOnNextEvent = True
+        except:
+            print 'Invalid config dictionary to add to psana options'
+
+    def del_psana_options(self, keys):
+        """Delete psana config dictionary keys.
+        """
+        try:
+            for key in keys:
+                self._data.psana_cfg_dict.pop(key, None)
+        except:
+            print 'Invalid keys to remove from psana options:', keys
 
     def add_module(self, *args, **kwargs): 
         """Add a detector module.
@@ -1697,11 +1784,13 @@ class Detector(object):
             
             elif plot_type is 'XYPlot':
                 plt_opts = ['xlabel','ylabel','formats']
-                plt_kwargs = {key: item for key, item in kwargs.items() if key in plt_opts}
+                plt_kwargs = {key: item for key, item in kwargs.items() \
+                              if key in plt_opts}
                 if 'xdata' in kwargs:
                     xdata = kwargs['xdata']
                 else:
-                    xdata = range(len(ydata))
+                    ydata = getattr(self,attr)
+                    xdata = np.arange(len(ydata))
                 plt_args = {'det': self._name,
                             'attr': attr,
                             'xdata': xdata,

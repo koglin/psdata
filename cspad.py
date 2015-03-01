@@ -5,6 +5,8 @@ from PSCalib.GeometryAccess import *
 
 from pylab import *
 
+import psana
+
 #import numpy as np
 #import matplotlib.pyplot as plt
 #from matplotlib.widgets import Button, Slider
@@ -22,11 +24,73 @@ class cspad(psdata.Detector):
     def __init__(self,*args,**kwargs):
 
         psdata.Detector.__init__(self,*args,**kwargs)
-        try:
-            self.load_geometry(**kwargs)
-            self.load_pixel_coord_indexes(**kwargs)
-        except:
-            print 'Cannot load geometry'
+        self.vmin = -50
+        self.vmax = 50
+
+        self.doPedestals = 'yes'
+        self.doPixelStatus = 'no'
+        self.doCommonMode = 'no'
+        self.set_cfg()
+
+#        try:
+#            self.load_geometry(**kwargs)
+#            self.load_pixel_coord_indexes(**kwargs)
+#        except:
+#            print 'Cannot load geometry'
+
+    def set_cfg(self, calibrated=True, reconstructed=True, peak_finder=False, **kwargs):
+        """Set psana cfg configuration with python dictionary 
+        """
+        if calibrated:
+            self.add_psana_options( { 
+                'cspad_mod.CsPadCalib': {
+                        'inputKey': '', 
+                        'outputKey': 'calibrated',
+                        'doPedestals': self.doPedestals,
+                        'doPixelStatus': self.doPixelStatus,
+                        'doCommonMode': self.doCommonMode}
+                } )
+
+        if reconstructed:
+            self.add_psana_options( { 
+                'CSPadPixCoords.CSPadImageProducer': {
+                        'source': '{:}'.format(self.src),
+                        'typeGroupName': 'CsPad::CalibV1',
+                        'key': 'calibrated',
+                        'imgkey': 'reconstructed',
+                        'tiltIsApplied': True,
+                        'print_bits': 0},
+                } )
+
+        if peak_finder:
+            self.add_psana_options( {
+                'ImgAlgos.CSPadArrPeakFinder': {
+                        'source':              '{:}'.format(self.src),
+                        'key':                 'calibrated',
+                        'key_peaks_out':       'peaks_out',
+                        'key_peaks_nda':       'peaks_nda',
+                        'rmin':                kwargs.get('rmin', 8),
+                        'dr':                  kwargs.get('dr', 1),
+                        'SoNThr_noise':        3,
+                        'SoNThr_signal':       4,
+                        'frac_noisy_imgs':     0.9,
+                        'peak_npix_min':       3,
+                        'peak_npix_max':       500,
+                        'peak_amp_tot_thr':    0.,
+                        'peak_SoN_thr':        5.,
+                        'event_npeak_min':     1,
+                        'event_npeak_max':     1000,
+                        'event_amp_tot_thr':   0.,
+                        'nevents_mask_update': 0,
+                        'nevents_mask_accum':  50,
+                        'selection_mode':      'SELECTION_ON',
+                        'out_file_bits':       15,
+                        'print_bits':          3681,},
+                'pyimgalgos.ex_peaks_nda': {
+                         'source':         '{:}'.format(self.src),
+                         'key_in':         'peaks_nda',
+                         'print_bits':     255},
+                } )
 
     def load_geometry(self,**kwargs):
         """Load psana geometry data.
@@ -98,15 +162,36 @@ class cspad(psdata.Detector):
     def image(self):
         """Create image from data_array.
         """
-        return img_from_pixel_arrays(self.iX,self.iY,W=self.data_array)
+#        return img_from_pixel_arrays(self.iX,self.iY,W=self.data_array)
+        image = np.array(self.reconstructed)
+#        klow = image < self.vmin
+#        khigh = image > self.vmax 
+#        image[klow] = self.vmin
+#        image[khigh] = self.vmax
+        return image
 
-    def plot(self):
+    def new_plot(self):
+        plt.ion()
+        plt.imshow(self.image)
+        plt.clim(vmin=self.vmin,vmax=self.vmax)
+        plt.colorbar()
+        plt.title(self.desc)
+
+    def plot(self, nevents=1, monitor=False, next_event=False):
         """Plot CSpad image.
         """
-        plt.imshow(self.image)
-        plt.show()
-
-        return
+        ievent = 0
+        try:
+            plt.ion()
+            plt.show()
+            while ievent < nevents or monitor:
+                if ievent > 0 or next_event or monitor:
+                    self._data.next_event()
+                plt.imshow(self.image)
+                plt.draw()
+                ievent += 1
+        except KeyboardInterrupt:
+            pass
 
     def publish(self, name=None, title=None, 
                 start=True, stop=False):
@@ -128,4 +213,31 @@ class cspad(psdata.Detector):
             self.del_psplot(name)
 
 
+#                'ImgAlgos.ImgPeakFinder': { 
+#                        'source': '{:}'.format(self.src),
+##                        'key': 'reconstructed',
+#                        'key': 'calibrated',
+#                        'peaksKey': 'peaks',
+#                        'threshold_low': 2,
+#                        'threshold_high': 5,
+#                        'sigma': 1.5,
+#                        'smear_radius': 5,
+#                        'peak_radius': 7,
+#                        'xmin': 20,
+#                        'xmax': 1700,
+#                        'ymin': 20,
+#                        'ymax': 1700,
+##                        'testEvent': 5,
+#                        'print_bits': 3,
+##                        'finderIsOn': True,
+#                        },
+#                'ImgAlgos.ImgPeakFilter': { 
+#                        'source':          '{:}'.format(self.src),
+#                        'key':             'peaks',
+#                        'threshold_peak':  5,
+#                        'threshold_total': 0,
+#                        'n_peaks_min':     10,
+#                        'print_bits':      11,
+#                        'fname':           'cspad-img',
+#                        'selection_mode':  'SELECTION_ON'},
 

@@ -200,6 +200,8 @@ class IMS(device.Device):
         'log_h':                  ('LOGH', 'Log H')
     }
 
+    config = ['DESC','PREC','EGU','DTYP','PN','SN','VERS']
+
     records = {
         'STATUS':                 ('STATUS',     'IMS Status'),
         'cfg_file':               ('CFG_FILE',   'Configuration File'),

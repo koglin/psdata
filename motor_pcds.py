@@ -149,6 +149,7 @@ class Motor(device.Device):
        'version':                ('VERS', 'Code Version '),
        'max_speed':              ('VMAX', 'Max Velocity (EGU/s)'),
        'record_type':            ('RTYP', 'Record Type'),
+       'device_type':            ('DTYP', 'Device Type'),
        'status':                 ('STAT', 'Status')
     }
     records = {
@@ -157,6 +158,8 @@ class Motor(device.Device):
 #       'tweak_forward':          ('TWF',  'Tweak motor Forward '),
 #       'tweak_reverse':          ('TWR',  'Tweak motor Reverse ')
     }
+
+    config = ['DESC','PREC','EGU','DTYP','VERS']
 
     _attr_tuple = {}
     _alias = {}

@@ -137,6 +137,7 @@ class Newport(device.Device):
 #       'tweak_forward':          ('TWF',  'Tweak motor Forward '),
 #       'tweak_reverse':          ('TWR',  'Tweak motor Reverse ')
     }
+    config = ['DESC','PREC','EGU','DTYP','VERS','TYPE']
 
     _attr_tuple = {}
     _alias = {}
