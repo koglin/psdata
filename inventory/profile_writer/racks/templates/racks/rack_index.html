@@ -1,0 +1,20 @@
+<div class='datagrid'><table>
+<thead><tr><th>Rack</th><th>Hutch</th><th>Building</th><th>Height</th></tr></thead>
+<tfoot><tr><td colspan="30"><div id='paging'>
+<tbody>
+{% for rack in hutch.rack_set.all %}
+
+    <tr>
+
+        <td> {{rack.name}} </td>
+        <td> {{rack.hutch}} </td>
+        <td> {{hutch.building }} </td>
+        <td> {{rack.height}} </td>
+
+    </tr>
+
+{% endfor %}
+
+</tbody>
+</table></div>
+

@@ -21,7 +21,7 @@ class spectrometer(psdata.Detector):
     def projection(self):
         """Spectrometer Projection.
         """
-        return self.data_array.sum(axis=0)
+        return self.hproj
 
     def new_figure(self):
         """Make a new matplotlib figure.
@@ -29,14 +29,14 @@ class spectrometer(psdata.Detector):
         self._plot_initialized = True
         plt.ion()
         plt.figure()
-        plt.suptitle('Spectrometer')
         return
 
-    def plot(self, image=True):
+    def plot(self, init=False, image=False, title='Spectrometer'):
         """Plot Spectrometer Projection.
         """
-        if not self._plot_initialized:
+        if init or not self._plot_initialized:
             self.new_figure()
+            self.add_event_function('plot', image=image, title=title)
 
         if image:
             if self.data_array is not None:
@@ -46,7 +46,29 @@ class spectrometer(psdata.Detector):
             if self.projection is not None:
                 plt.plot(self.projection)
                 plt.draw()
+                plt.suptitle(self._data.event_info)
+                plt.title(title)
         
         return
+
+    def publish(self, name=None, title=None,
+                start=True, stop=False, **kwargs):
+        """Publish plot with psmon.
+           Plot can be read on multiple machines with psplot.
+        """
+        plotdata = 'hproj' 
+           
+        if not title:
+            if self._desc:
+                title = self._desc
+            else:
+                title = self._name
+
+        if start:
+            self.add_psplot(plotdata, plot_type='XYplot', 
+                                name=name, title=title, **kwargs)
+            
+        if stop:
+            self.del_psplot(name)
 
 

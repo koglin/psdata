@@ -16,10 +16,11 @@ import time
 #import math
 
 # epics device interface
-import lcls_devices
+#import lcls_devices
 
 # import standard python scientific data analysis packages from ana-release
-from pylab import *
+#from pylab import *
+import numpy as np
 
 # import PCDS specific python packages from ana-release
 import pyami
@@ -29,29 +30,30 @@ import pyami
 #              'platform':  4,
 #              'proxy':     'daq-cxi-mon03'}
 
-class Daq(object):
-
-    def __init__(self, 
-                 daq_host=None, 
-                 platform=4, 
-                 **kwargs):
-        """Initialize Daq connection.
-        """
-        self.daq_host = daq_host
-        self.platform = platform
-        self.control = pydaq.Control(self.daq_host,self.platform)
+#class Daq(object):
+#
+#    def __init__(self, 
+#                 daq_host=None, 
+#                 platform=4, 
+#                 **kwargs):
+#        """Initialize Daq connection.
+#        """
+#        self.daq_host = daq_host
+#        self.platform = platform
+#        self.control = pydaq.Control(self.daq_host,self.platform)
 
 class Ami(object):
 
-    _epics_devices = {}
-    _epics_live = False
+#    _epics_devices = {}
+#    _epics_live = False
     _ami_detectors = {}
-    _device_sets = {}
+#    _device_sets = {}
     _defaults = {'xvariable': 'ProcTime',
                  'nbins':     100}
 
     def __init__(self, 
-                 proxy_host='daq-cxi-mon02', 
+                 proxy_host=None, 
+#                 proxy_host='daq-cxi-mon02', 
 #                 daq_host=None, 
 #                 platform=4, 
                  instrument=None,
@@ -63,10 +65,20 @@ class Ami(object):
 #        self.connect(proxy_host)
 #
 #    def connect(self,proxy_host):
-        self.proxy_host = proxy_host
+        if proxy_host:
+            self.proxy_host = proxy_host
+        elif instrument:
+            self.proxy_host = 'daq-'+instrument+'-mon01'
+        else:
+            raise NameError('Cannot load psami.')
+            print 'Neither proxy_host or instrument are specified' 
+
         if not instrument:
-            instrument = self.proxy_host.split('-')[1]
-        
+            try:
+                instrument = self.proxy_host.split('-')[1]
+            except:
+                instrument = None
+
         self.instrument = instrument
 #        self.load_epics_dict()
 
@@ -76,34 +88,35 @@ class Ami(object):
         self._pname = socket.gethostbyname(self.proxy_host)
         self._paddr = struct.unpack('>I',socket.inet_aton(self._pname))[0]
         self._pyami = pyami
-        self._pyami.connect(self._paddr)
+#        self._pyami.connect(self._paddr)
+        self._pyami.connect(self._pname)
 
         if hasattr(self._pyami,'list_env'):
             self._env = AmiEnv(self, self._env_dict)
             self._env_attrs = list(set([val['components'][0] for key,val 
                                         in self._env_dict.items()]))
 
-    def load_epics_dict(self, instrument=None,epics_dir=None,epics_file=None):
-        """Load dictionary of epics pvs into _epics_dict based on
-           an epicsArch.txt file used by the daq to archive epics
-           data in the xtc data files.
-        """
-        if not epics_file:
-            epics_file = 'epicsArch.txt'
-        
-        if not epics_dir:
-            epics_dir = '/reg/g/pcds/dist/pds/'+instrument+'/misc/'
-        
-        self._epics_dict = lcls_devices.epicsArch_dict(epics_file,epics_dir)
-
-    def add_live_pv(self, pv):
-        """Add live epics PV as pyepics device class.
-           _epics_devices is a dictionary of pyepics PV Devices
-           that will can be called from the pv alias in the 
-           psami.AmiDetector class. 
-        """
-        if pv not in self._epics_devices:
-            self._epics_devices[pv] = lcls_devices.get_live_pv(self, pv)        
+#    def load_epics_dict(self, instrument=None,epics_dir=None,epics_file=None):
+#        """Load dictionary of epics pvs into _epics_dict based on
+#           an epicsArch.txt file used by the daq to archive epics
+#           data in the xtc data files.
+#        """
+#        if not epics_file:
+#            epics_file = 'epicsArch.txt'
+#        
+#        if not epics_dir:
+#            epics_dir = '/reg/g/pcds/dist/pds/'+instrument+'/misc/'
+#        
+#        self._epics_dict = lcls_devices.epicsArch_dict(epics_file,epics_dir)
+#
+#    def add_live_pv(self, pv):
+#        """Add live epics PV as pyepics device class.
+#           _epics_devices is a dictionary of pyepics PV Devices
+#           that will can be called from the pv alias in the 
+#           psami.AmiDetector class. 
+#        """
+#        if pv not in self._epics_devices:
+#            self._epics_devices[pv] = lcls_devices.get_live_pv(self, pv)        
 
     @property
     def _ami_dict(self):
@@ -126,7 +139,8 @@ class Ami(object):
         env_dict = {}
         for env_item in self._pyami.list_env():
             item = env_item['name'].replace('-','_').replace(' ','_')
-            components = re.split(':|\.',item)
+            item = item.replace('[','_').replace(']','')
+            components = re.split(':|\.|-',item)
             for i,val in enumerate(components):
                 if val[0].isdigit():
                      components[i] = 'n'+components[i]
@@ -213,8 +227,8 @@ class Ami(object):
 
 class AmiDetector(object):
 
-    _attrs = []
-    _user_funcs = {} 
+    _ami_attrs = []
+#    _user_funcs = {} 
     _init = None
 
     def __init__(self, ami, name):
@@ -225,6 +239,8 @@ class AmiDetector(object):
             det_dict = ami._ami_dict[name]
             det_type = det_dict['type']
             det_id = det_dict['det_id']
+            if det_id == 0L:
+                det_id = det_dict['name']
         elif name in ami._env_dict:
             det_dict = None
             det_id = name 
@@ -235,7 +251,7 @@ class AmiDetector(object):
             self._entry = ami._pyami.Entry(det_id)
         elif det_type in 'Waveform':
             try:
-                channel = int(name.split('_')[-1])
+                channel = int(name.split('_')[-1]-1)
             except:
                 channel = 0
             self._entry = ami._pyami.Entry(det_id, channel)
@@ -247,127 +263,135 @@ class AmiDetector(object):
             if det_dict:
                 for attr,val in det_dict.items():
                     setattr(self, attr, val)
-            self.connect()
+            self.ami_connect()
         
-    def connect(self,max_attempts=5,iattempt=0):
+    def ami_connect(self,max_attempts=5,iattempt=0):
         """Recursively try to connect to the ami detector up to max_attempts times.
         """
         try:
-            self.clear()
-            self.get()
-            self._connected = True
+            self.ami_clear()
+            self.ami_get()
+            self._ami_connected = True
             print 'Connected on attempt #',iattempt+1
         except:
             print 'No AMI connect for ',self._name
-            self._connected = False 
+            self._ami_connected = False 
             if iattempt < max_attempts:
-                self.connect(iattempt=iattempt+1)
+                self.ami_connect(iattempt=iattempt+1)
 
-    def clear(self):
+    def ami_clear(self):
         """Resets the data accumulation.
         """
         self._time0 = time.time()
         self._entry.clear()
 
-    def get(self):
+    def ami_get(self):
         """Get next events since connected or last clear.
         """
         self._event = self._entry.get()
-        self._attrs = self._event.keys()
+        self._ami_attrs = self._event.keys()
         return self._event
 
-    def load_functions(self, module_name, path=None):
-        """Load functions from file that operate on the detector class attributes. 
-           These functions will be held in self._user_funcs and printed out in self.show_info()
-        """
-        if True:
-#        try:
-            if not path:
-                path = os.getcwd()
-            if not isinstance(path,list):
-                path = [path]
-            file,filename,desc = imp.find_module(module_name,path)
-            funcs = imp.load_module(module_name, file, filename, desc)
-            if hasattr(funcs,'_init'):
-                getattr(funcs,'_init')(self)
-            attrs = [attr for attr in funcs.__dict__
-                     if not attr.startswith('__')
-                     and attr is not '_init'
-                     and not hasattr(getattr(funcs,attr),'__base__')]
-            for attr in attrs:
-                if True:
-#                try:
-                    print 'Adding', attr, 'to', self._name
-                    self.add_function(getattr(funcs,attr))
-#                except:
-#                    print 'Error adding', attr, 'to', self._name
+#    def load_functions(self, module_name, path=None):
+#        """Load functions from file that operate on the detector class attributes. 
+#           These functions will be held in self._user_funcs and printed out in self.show_info()
+#        """
+#        if True:
+##        try:
+#            if not path:
+#                path = os.getcwd()
+#            if not isinstance(path,list):
+#                path = [path]
+#            file,filename,desc = imp.find_module(module_name,path)
+#            funcs = imp.load_module(module_name, file, filename, desc)
+#            if hasattr(funcs,'_init'):
+#                getattr(funcs,'_init')(self)
+#            attrs = [attr for attr in funcs.__dict__
+#                     if not attr.startswith('__')
+#                     and attr is not '_init'
+#                     and not hasattr(getattr(funcs,attr),'__base__')]
+#            for attr in attrs:
+#                if True:
+##                try:
+#                    print 'Adding', attr, 'to', self._name
+#                    self.add_function(getattr(funcs,attr))
+##                except:
+##                    print 'Error adding', attr, 'to', self._name
 
 #        except:
 #            print 'ERROR loading ',module_name, ' from ', path, ' for ',self._name
 
-    def add_function(self, func_name, *args, **kwargs):
-        """Add a function that operates on this detector object.
-                add_function(func_name [, attr])
-           The result will be added as an attribute to the detecor with the
-           name of the function unless attr is provided.
-           For example:
-            > def myfunc(self):       
-                  return self.ebeamL3Energy
-            > data.ebeam.add_function(myfunc, 'energy')
+#    def add_function(self, func_name, *args, **kwargs):
+#        """Add a function that operates on this detector object.
+#                add_function(func_name [, attr])
+#           The result will be added as an attribute to the detecor with the
+#           name of the function unless attr is provided.
+#           For example:
+#            > def myfunc(self):       
+#                  return self.ebeamL3Energy
+#            > data.ebeam.add_function(myfunc, 'energy')
+#
+#           Or alternatively using lambda:
+#            > data.ebeam.add_function(lambda self: self.ebeamL3Energy, 'energy')
+#        """
+#        if len(args) > 0:
+#            attr = args[0]
+#        else:
+#            attr = func_name.func_name
+#        self._user_funcs[attr] = func_name
 
-           Or alternatively using lambda:
-            > data.ebeam.add_function(lambda self: self.ebeamL3Energy, 'energy')
+#    def get_function(self,attr):
+#        """Return a user defined function from self._user_funcs.
+#        """
+#        func_name = self._user_funcs[attr]
+#        if hasattr(func_name,'__call__'):
+#            func_name = func_name(self)
+#        return func_name
+#
+#    def del_functions(self, *args):
+#        if len(args) > 0:
+#            attrs = args
+#        else:
+#            self._user_function.clear()
+
+    def get_ami_attr(self, attr):
+        """Get ami attribute.
         """
-        if len(args) > 0:
-            attr = args[0]
-        else:
-            attr = func_name.func_name
-        self._user_funcs[attr] = func_name
-
-    def get_function(self,attr):
-        """Return a user defined function from self._user_funcs.
-        """
-        func_name = self._user_funcs[attr]
-        if hasattr(func_name,'__call__'):
-            func_name = func_name(self)
-        return func_name
-
-    def del_functions(self, *args):
-        if len(args) > 0:
-            attrs = args
-        else:
-            self._user_function.clear()
-
-    def __getattr__(self,attr):
-        if attr in self._attrs:
-            if not self._connected:
-                self.connect()
+        if attr in self._ami_attrs:
+            if not self._ami_connected:
+                self.ami_connect()
             try:
                 self._event = self._entry.get()
-                return self._event[attr]
-#                if attr in 'data':
-## check if CsPad type = ImageArray
-#                    return np.array(self._event[attr])
-#                else:
-#                    return self._event[attr]            
+                val = self._event[attr]
+                try:
+                    if isinstance(val, list):
+                        val = np.array(val)
+                except:
+                    pass
+                
+                return val
             except:
                 return None
-        if attr in self._user_funcs:
-            return self.get_function(attr)
 
-    def get_info(self):
+    def __getattr__(self, attr):
+        if attr in self._ami_attrs:
+            return self.get_ami_attr(attr)
+#        if attr in self._user_funcs:
+#            return self.get_function(attr)
+
+    def get_ami_info(self):
         """String of basic inforamtion for AMI Detector.
         """
-        if not self._connected:
-            self.connect()
+        if not self._ami_connected:
+            self.ami_connect()
 #        try:
         if True:
-            event = self.get()
+            event = self.ami_get()
             delta_time = max([event['time']-self._time0,0])
             if delta_time > 0:
                 event_rate = event['entries']/delta_time
             else:
-                event_rate = np.NAN
+                event_rate = float('NaN')
             if event['type'] in 'Scalar':
                 info_str = '{:s} = {:.1f}+-{:.1f}, {:} entries in {:.2f} sec ({:.0f} Hz): {:s}'.format(
                             event['type'], event['mean'], event['rms'], event['entries'], 
@@ -391,17 +415,17 @@ class AmiDetector(object):
 
     def __repr__(self):
         try:
-            repr_str = '<AMI Detector '+self.get_info()+'>'
+            repr_str = '<AMI Detector '+self.get_ami_info()+'>'
         except:
-            repr_str = '<AMI Detector -- Unknown Type in get_info() method>'
+            repr_str = '<AMI Detector -- Unknown Type in get_ami_info() method>'
         
         return repr_str
 
     def __dir__(self):
-        all_attrs = set(self._attrs +
-                        self._user_funcs.keys() +
+        all_ami_attrs = set(self._ami_attrs +
+#                        self._user_funcs.keys() +
                         self.__dict__.keys() + dir(AmiDetector))
-        return list(sorted(all_attrs))
+        return list(sorted(all_ami_attrs))
 
 
 class AmiEnv(object):
@@ -430,7 +454,7 @@ class AmiEnv(object):
 
     def get_info(self):
         info = ''
-        for attr in list(sort(self._attr_dict.keys())):
+        for attr in list(sorted(self._attr_dict.keys())):
             try:
                 info += '{:20} {:}\n'.format(attr,self._pyami.get_detector(attr).get_info())
             except:

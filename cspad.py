@@ -1,174 +1,206 @@
 import psdata
 import os
 from glob import glob
-from PSCalib.GeometryAccess import *
-
-from pylab import *
 
 import psana
+from ImgAlgos.PyAlgos import PyAlgos
 
-#import numpy as np
-#import matplotlib.pyplot as plt
-#from matplotlib.widgets import Button, Slider
-#import matplotlib.patches as plt_patches
+from pylab import *
+import numpy as np
 
-quad_colors = ['k', 'g', 'purple', 'b']
+# These need updating
+_zoffset_defaults = {
+        'DsaCsPad': 555.,
+        'DscCsPad': 555.,
+        'DsdCsPad': 2000.,
+        }
+
+_algos_keys = ['windows', 'mask', 'pbits']
+_peak_keys = ['npix_min', 'npix_max', 'amax_thr', 'atot_thr', 'son_min']
 
 class cspad(psdata.Detector):
     """cspad Detector Class of psdata.Detector.
     """
 
-    data_shape = (4, 8, 185, 388)
-#    module_attrs = ['data_array','image','geom_path','geom_file']
+    _default_params = {
+            'thr_saturated': 10000.,
+            'thr_hit': 500, 
+            'thr_low': 5,
+            'thr_high': 3000,
+            'radius': 5,
+            'dr': 0.05,
+            'windows': [(s, 0, 185, 0, 388) for s in (0,1,7,8,9,15,16,17,23,24,25,31)],
+            'mask': np.ones((32,185,388)),
+            'npix_min': 2,
+            'npix_max': 500,
+            'amax_thr': 10,
+            'atot_thr': 20,
+            'son_min': 5,
+            'pbits': 0,
+            }
+
+    _peak_header = 'Seg  Row  Col  Npix      Amax      Atot   rcent   ccent rsigma  csigma '+\
+          'rmin rmax cmin cmax    bkgd     rms     son'
+    _peak_format = '%3d %4d %4d  %4d  %8.1f  %8.1f  %6.1f  %6.1f %6.2f  %6.2f '+\
+           '%4d %4d %4d %4d  %6.2f  %6.2f  %6.2f'
 
     def __init__(self,*args,**kwargs):
 
         psdata.Detector.__init__(self,*args,**kwargs)
-        self.vmin = -50
-        self.vmax = 50
-
-        self.doPedestals = 'yes'
-        self.doPixelStatus = 'no'
-        self.doCommonMode = 'no'
-        self.set_cfg()
-
-#        try:
-#            self.load_geometry(**kwargs)
-#            self.load_pixel_coord_indexes(**kwargs)
-#        except:
-#            print 'Cannot load geometry'
-
-    def set_cfg(self, calibrated=True, reconstructed=True, peak_finder=False, **kwargs):
-        """Set psana cfg configuration with python dictionary 
-        """
-        if calibrated:
-            self.add_psana_options( { 
-                'cspad_mod.CsPadCalib': {
-                        'inputKey': '', 
-                        'outputKey': 'calibrated',
-                        'doPedestals': self.doPedestals,
-                        'doPixelStatus': self.doPixelStatus,
-                        'doCommonMode': self.doCommonMode}
-                } )
-
-        if reconstructed:
-            self.add_psana_options( { 
-                'CSPadPixCoords.CSPadImageProducer': {
-                        'source': '{:}'.format(self.src),
-                        'typeGroupName': 'CsPad::CalibV1',
-                        'key': 'calibrated',
-                        'imgkey': 'reconstructed',
-                        'tiltIsApplied': True,
-                        'print_bits': 0},
-                } )
-
-        if peak_finder:
-            self.add_psana_options( {
-                'ImgAlgos.CSPadArrPeakFinder': {
-                        'source':              '{:}'.format(self.src),
-                        'key':                 'calibrated',
-                        'key_peaks_out':       'peaks_out',
-                        'key_peaks_nda':       'peaks_nda',
-                        'rmin':                kwargs.get('rmin', 8),
-                        'dr':                  kwargs.get('dr', 1),
-                        'SoNThr_noise':        3,
-                        'SoNThr_signal':       4,
-                        'frac_noisy_imgs':     0.9,
-                        'peak_npix_min':       3,
-                        'peak_npix_max':       500,
-                        'peak_amp_tot_thr':    0.,
-                        'peak_SoN_thr':        5.,
-                        'event_npeak_min':     1,
-                        'event_npeak_max':     1000,
-                        'event_amp_tot_thr':   0.,
-                        'nevents_mask_update': 0,
-                        'nevents_mask_accum':  50,
-                        'selection_mode':      'SELECTION_ON',
-                        'out_file_bits':       15,
-                        'print_bits':          3681,},
-                'pyimgalgos.ex_peaks_nda': {
-                         'source':         '{:}'.format(self.src),
-                         'key_in':         'peaks_nda',
-                         'print_bits':     255},
-                } )
-
-    def load_geometry(self,**kwargs):
-        """Load psana geometry data.
-        """
-        if hasattr(self,'_det'):
-            self.src_str = '{detName}.{detId}:{devName}.{devId}'.format(**self._det['det'])
-        if 'geom_path' in kwargs:
-            self.geom_path = kwargs['geom_path']
+        init_params = {
+                'vmin': -50.,
+                'vmax': 50.,
+                }
+  
+        self.set_parameter(**init_params)
+        if 'zoffset' in kwargs:
+            zoffset = kwargs.get('zoffset')
+        elif self._name in _zoffset_defaults:
+            zoffset = _zoffset_defaults.get(self._name)
         else:
-            dir = "/reg/d/psdm/{:}/{:}".format(self._data.instrument,self._data.exp)
-            calibfolder = os.listdir(dir+'/calib')
-            self.geom_path = '{:}/{:}/{:}/{:}/{:}'.format(dir,'calib',calibfolder[0],
-                                                          self.src_str,'geometry')
-        
-        if 'geom_file' in kwargs:
-            self.geom_file = kwargs['geom_file']
-        else:
-            geom_files = glob(self.geom_path+'/*.data')
-            self.geom_file = geom_files[0].rsplit('geometry/')[1]
-#            self.geom_file = geom_files[0].lstrip(self.geom_path).lstrip('/')
+            print 'No known zoffset for {:} CsPad.  Setting zoffset = 0'.format(self._name)
+            zoffset = 0
 
-        try:
-            self.geometry = GeometryAccess(self.geom_path+'/'+self.geom_file, 0377)
-        except:
-            self.geometry = None
+        self.set_parameter(zoffset=zoffset)
+        self.set_peak_parameters(**kwargs)
 
-#        self.geometry = GeometryAccess(self.geom_file, 0377)
+    def _init_proturacal(self):
+#        enc0 = { 'enc1o': 765946,
+#                 'enc2o': 734999,
+#                 'enc3o': 744066,
+#                 'enc4o': 684678,
+#                 'enc5o': 902429,
+        enc0 = { 'enc1o':  841320,
+                 'enc2o':  644555,
+                 'enc3o': 1035953,
+                 'enc4o':  842152,
+                 'enc5o':  811918,
+                 'enc1scale':  20000.,
+                 'enc2scale': -20000.,
+                 'enc3scale':  20000.,
+                 'enc4scale':  20000.,
+                 'enc5scale': -20000.,
+                 }
+        print enc0
+        self.set_parameter(**enc0)
 
-    def load_pedestal(self, **kwargs):
-        """Load pedestal data.
-        """
-        if hasattr(self,'_det'):
-            self.src_str = '{detName}.{detId}:{devName}.{devId}'.format(**self._det['det'])
-        if 'pedestal_path' in kwargs:
-            self.pedestal_path = kwargs['geom_path']
-        else:
-            dir = "/reg/d/psdm/{:}/{:}".format(self._data.instrument,self._data.exp)
-            calibfolder = os.listdir(dir+'/calib')
-            self.pedestal_path = '{:}/{:}/{:}/{:}/{:}'.format(dir,'calib',calibfolder[0],
-                                                          self.src_str,'pedestal')
+    def show_rel(self):
+       for i in range(1,6):
+           desc = getattr(self, 'm'+str(i)).DESC
+           enc = getattr(self, 'enc'+str(i)).value
+           enco = getattr(self, 'enc'+str(i)+'o')
+           encscale = getattr(self, 'enc'+str(i)+'scale')
+           print '{:4} {:14} {:10.3f}'.format(i, desc, (enc-enco)/encscale)
+           #print i, enc, enco,encscale 
 
-        try:
-            self.pedestal = None
-        except:
-            self.pedestal = None
+    def set_peak_parameters(self, **kwargs):
+        for param, value in self._default_params.items():
+            if param not in kwargs:
+                kwargs.update({param: value})
+ 
+        self.set_parameter(**kwargs)
 
-    def load_pixel_coord_indexes(self,xy0_off_pix=(880, 880), **kwargs):
-        """Load pixel coordinate indexes into (iX, iY).
-        """
-        if self.geometry:
-            iX, iY = self.geometry.get_pixel_coord_indexes(
-                                    xy0_off_pix=xy0_off_pix)         
-            self.iX = iX.reshape(self.data_shape)
-            self.iY = iY.reshape(self.data_shape)
-
+        algos_kwargs = {key: kwargs.get(key) for key in _algos_keys}
+        self._algos = PyAlgos(**algos_kwargs)
+        peak_kwargs = {key: kwargs.get(key) for key in _peak_keys}
+        self._algos.set_peak_selection_pars(**peak_kwargs)
+    
     @property
-    def data_array(self):
-        """Put quads data into an array of shape (4, 8, 185, 388).
+    def z_calibrated(self):
+        """Calibrated CsPad Z position based on zoffset.
         """
-        data_array = np.empty(self.data_shape, np.int)
-        for i in xrange(self.quads_shape[0]):
-            quad = self.quads(i).data()
-            for j in xrange(8):
-                data_array[i,j] = quad[j] 
-
-        return data_array
+        return self.zoffset - self.z.value
 
     @property
     def image(self):
-        """Create image from data_array.
+        """Create image using psana PyDetector methods to access calib store.
         """
-#        return img_from_pixel_arrays(self.iX,self.iY,W=self.data_array)
-        image = np.array(self.reconstructed)
-#        klow = image < self.vmin
-#        khigh = image > self.vmax 
-#        image[klow] = self.vmin
-#        image[khigh] = self.vmax
+        image = self.detector.image
+
         return image
+
+    @property
+    def calib(self):
+        return self.detector.calib
+
+    @property
+    def pixels_saturated(self):
+        """Number of saturated pixels in calibrated data (self.calib)
+           Set self.thr_saturated to adjust saturated pixel level.
+        """
+        try:
+            return self._algos.number_of_pix_above_thr(self.calib, self.thr_saturated)
+        except:
+            print 'Error caclulating number pixels saturated'    
+
+    @property
+    def pixels_hit(self):
+        """Number of pixels hit in calibrated data (self.calib)
+           Set self.thr_hit to adjust hit pixel level.
+        """
+        try:
+            return self._algos.number_of_pix_above_thr(self.calib, self.thr_hit)
+        except:
+            print 'Error caclulating number of pixels hit'
+
+    @property
+    def peaks(self): 
+        """2-d array of peak parameters.
+            
+            PEAK FINDERS
+            =========================
+            Peak finders return list (numpy.array) of records with found peak parameters.
+
+            # v1 - aka Droplet Finder - two-threshold peak-finding algorithm in restricted region
+            #                           around pixel with maximal intensity.
+            peaks = alg.peak_finder_v1(nda, thr_low=10, thr_high=150, radius=5, dr=0.05)
+
+            # v2 - define peaks for regoins of connected pixels above threshold
+            peaks = alg.peak_finder_v2(nda, thr=10, r0=5, dr=0.05)
+
+            # v3 - define peaks in local maximums of specified rank (radius),
+            #      for example rank=2 means 5x5 pixel region around central pixel.
+            peaks = alg.peak_finder_v3(nda, rank=2, r0=5, dr=0.05)
+
+        """
+        peaks = self._algos.peak_finder_v1(self.calib, 
+                                   thr_low=self.thr_low, 
+                                   thr_high=self.thr_high, 
+                                   radius=self.radius, 
+                                   dr=self.dr)
+
+        return peaks 
+
+    def show_stats(self, **kwargs): 
+        print '{:} saturated pixels (> {:} adu)'.format(self.pixels_saturated, self.thr_saturated)
+        print '{:} hit pixels (> {:} adu)'.format(self.pixels_hit, self.thr_hit)
+        
+    def show_peaks(self, **kwargs):
+        print self._peak_header
+        for peak in self.peaks :
+            seg,row,col,npix,amax,atot,rcent,ccent,rsigma,csigma,\
+            rmin,rmax,cmin,cmax,bkgd,rms,son = peak[0:17]
+             
+            print self._peak_format % (seg, row, col, npix, amax, atot,\
+                                       rcent, ccent, rsigma, csigma,\
+                                       rmin, rmax, cmin, cmax, bkgd, rms, son)
+
+
+#    totint = alg.intensity_of_pix_above_thr(nda, thr)
+#    print '%.1f is a total intensity in pixels above threshold =%5.1f' % (totint, thr)
+
+   
+#    @property
+#    def data_array(self):
+#        """Cspad data array of shape (4, 8, 185, 388).
+#           Use calibrated data if available
+#        """
+#        return self.quads_array(attr='calibrated')
+
+    def make_hist(self, bins=(arange(400)-.5)*30):
+        """Make histogram of CSpad.
+        """
+        self.yhist, self.xhist =  np.histogram(self.detector.calib, bins=bins)
 
     def new_plot(self):
         plt.ion()
@@ -194,7 +226,7 @@ class cspad(psdata.Detector):
             pass
 
     def publish(self, name=None, title=None, 
-                start=True, stop=False):
+                start=True, stop=False, **kwargs):
         """Publish plot with psmon.
            Plot can be read on multiple machines with psplot.
         """
@@ -207,37 +239,10 @@ class cspad(psdata.Detector):
 
         if start:
             self.add_psplot('image', plot_type='Image', 
-                            name=name, title=title)
+                            name=name, title=title, local=True)
         
         if stop:
             self.del_psplot(name)
 
 
-#                'ImgAlgos.ImgPeakFinder': { 
-#                        'source': '{:}'.format(self.src),
-##                        'key': 'reconstructed',
-#                        'key': 'calibrated',
-#                        'peaksKey': 'peaks',
-#                        'threshold_low': 2,
-#                        'threshold_high': 5,
-#                        'sigma': 1.5,
-#                        'smear_radius': 5,
-#                        'peak_radius': 7,
-#                        'xmin': 20,
-#                        'xmax': 1700,
-#                        'ymin': 20,
-#                        'ymax': 1700,
-##                        'testEvent': 5,
-#                        'print_bits': 3,
-##                        'finderIsOn': True,
-#                        },
-#                'ImgAlgos.ImgPeakFilter': { 
-#                        'source':          '{:}'.format(self.src),
-#                        'key':             'peaks',
-#                        'threshold_peak':  5,
-#                        'threshold_total': 0,
-#                        'n_peaks_min':     10,
-#                        'print_bits':      11,
-#                        'fname':           'cspad-img',
-#                        'selection_mode':  'SELECTION_ON'},
 

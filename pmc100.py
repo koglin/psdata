@@ -11,7 +11,7 @@
 import sys
 import time
 import epics 
-import device
+from lcls_devices import Device
 
 class MotorLimitException(Exception):
     """ raised to indicate a motor limit has been reached """
@@ -29,7 +29,7 @@ class MotorException(Exception):
     def __str__(self):
         return str(self.msg)
 
-class Arcus(device.Device):
+class Arcus(Device):
     """Epics Motor Motor Class for pyepics3
    
    !!!! WARNING -- Hacked from General Motor Record / IMS Record 
@@ -73,7 +73,6 @@ class Arcus(device.Device):
       m = Motor('13BMD:m38')
       m.move(10)               # Move to position 10 in user coordinates
       m.move(100, dial=True)   # Move to position 100 in dial coordinates
-      m.move(1, step=True, relative=True) # Move 1 step relative to current position
 
       m.stop()                 # Stop moving immediately
       high = m.high_limit      # Get the high soft limit in user coordinates
@@ -83,10 +82,8 @@ class Arcus(device.Device):
       p=m.get_position()       # Get the desired motor position in user coordinates
       p=m.get_position(dial=1) # Get the desired motor position in dial coordinates
       p=m.get_position(readback=1) # Get the actual position in user coordinates
-      p=m.get_position(readback=1, step=1) Get the actual motor position in steps
       p=m.set_position(100)   # Set the current position to 100 in user coordinates
          # Puts motor in Set mode, writes value, puts back in Use mode.
-      p=m.set_position(10000, step=1) # Set the current position to 10000 steps
 
     """
     # parameter name (short), PV suffix,  longer description
@@ -101,6 +98,7 @@ class Arcus(device.Device):
         'done_moving':            ('DMOV', 'Done moving to value'),
         'dial_readback':          ('DRBV', 'Dial Readback Value'),
         'dial_drive':             ('DVAL', 'Dial Desired Value'),
+        'encoder_step':           ('ERES', 'Encoder Step Size '),
         'units':                  ('EGU',  'Engineering Units '),
         'high_limit':             ('HLM',  'User High Limit  '),
         'high_limit_set':         ('HLS',  'High Limit Switch  '),
@@ -113,15 +111,20 @@ class Arcus(device.Device):
         'offset':                 ('OFF',  'User Offset (EGU) '),
         'precision':              ('PREC', 'Display Precision '),
         'readback':               ('RBV',  'User Readback Value '),
-        'retry_max':              ('RTRY', 'Max retry count    '),
+        'retry_max':              ('RTRY', 'Max retry count'),
+        'stall_detection_delta':  ('SDD',  'Stall detection delta'),
+        'stall_detection_delay':  ('SDS',  'Stall detection delay'),
 #        'stop':                   ('STOP', 'Stop  '),
         'tweak_val':              ('TWV',  'Tweak Step Size (EGU) '),
         'drive':                  ('VAL',  'User Desired Value'),
-        'slew_speed':             ('VELO', 'Velocity (EGU/s) '),
+        'base_speed':             ('VBAS', 'Base Velocity (pps)'),
+        'max_speed':              ('VMAX', 'Max Velocity (pps)'),
+        'slew_speed':             ('VELO', 'Instantaneous Velocity (pps)'),
         'version':                ('VERS', 'Code Version '),
         'record_type':            ('RTYP', 'Record Type'),
         'device_type':            ('DTYP', 'Device Type'),
         'encoder':                ('ENCM', 'Encoder Factor'),
+        'usb':                    ('USB',  'USB File Name'),
         'sl_status':              ('SLS',  'SL Status'),
         'pulse_polarity':         ('POL0', 'Pulse Polarity'),
         'dir_polarity':           ('POL1', 'Direction Polarity'),
@@ -142,43 +145,54 @@ class Arcus(device.Device):
         'adjust_offset':          ('FOFF', 'Adjust Offset/Controller'),
         'update_status':          ('STUP', 'Update Status'),
         'stop_program':           ('SPG',  'Stop Program'),
-        'status':                 ('STAT', 'Status')
+        'status':                 ('STAT', 'Status'),
+        'CMD':                    ('CMD', 'Mcode Command'),
+        'RESP':                   ('RESP', 'Mcode Response'),
+        'log_a':                  ('LOGA', 'Log A'),
+        'log_b':                  ('LOGB', 'Log B'),
+        'log_c':                  ('LOGC', 'Log C'),
+        'log_d':                  ('LOGD', 'Log D'),
+        'log_e':                  ('LOGE', 'Log E'),
+        'log_f':                  ('LOGF', 'Log F'),
+        'log_g':                  ('LOGG', 'Log G'),
+        'log_h':                  ('LOGH', 'Log H'),
     }
-    records = {
-#       'clear_error':            ('CLEAR_ERR.PROC', 'Clear Error Procedure')     
-#       'reverse_means':          ('REV_MEANS', 'Reverse means'),
-#       'forward_means':          ('FW_MEANS', 'Forward means'),
-#       'tweak_forward':          ('TWF',  'Tweak motor Forward '),
-#       'tweak_reverse':          ('TWR',  'Tweak motor Reverse ')
-    }
+#    records = {
+##       'clear_error':            ('CLEAR_ERR.PROC', 'Clear Error Procedure')     
+##       'reverse_means':          ('REV_MEANS', 'Reverse means'),
+##       'forward_means':          ('FW_MEANS', 'Forward means'),
+##       'tweak_forward':          ('TWF',  'Tweak motor Forward '),
+##       'tweak_reverse':          ('TWR',  'Tweak motor Reverse ')
+#    }
 
     config = ['DESC','PREC','EGU','DTYP','VERS']
 
     _attr_tuple = {}
     _alias = {}
     _fields = {}
-    _records = {}
+#    _records = {}
     _mutable = False
 
     _nonpvs = ('_prefix', '_pvs', '_delim', '_init', '_init_list',
                '_alias', '_fields', '_records')
-    _info_attrs = ['DESC', 'VAL', 'RBV', 'EGU', 'PREC', 'VELO', 'ACCL',
-                               'STAT', 'TWV','LLM', 'HLM', 'RTYP'] 
-    _log_attrs = []
+    _info_attrs = ['DESC', 'NAME', 'VAL', 'RBV', 'EGU', 'PREC', 'VELO', 'ACCL',
+                   'STAT', 'TWV','LLM', 'HLM', 'DIR', 
+                   'SLRF', 'SLRR', 
+                   'POL0', 'POL1', 'USB', 'RTYP'] 
+    _log_attrs = ['LOGA', 'LOGB', 'LOGC', 'LOGD', 'LOGE', 'LOGF', 'LOGG', 'LOGH']
     _init_list = _info_attrs
 
         
     def __init__(self, name=None, 
-                 fields=fields, records=records, 
-                 mutable=False, timeout=3.0):
+                 fields=fields,  
+                 mutable=False, timeout=3.0, **kwargs):
         if name is None:
             raise MotorException("must supply motor name")
 
-        self._attr_tuple = dict(records.items() + fields.items())
-        self._alias = {item[0]: item[1][0] for item in records.items() + fields.items()}
+        self._attr_tuple = dict(fields.items())
+        self._alias = {item[0]: item[1][0] for item in fields.items()}
 
         self._fields = [item[1][0] for item in fields.items()]
-        self._records = [item[1][0] for item in records.items()]
 
         if name.endswith('.VAL'):
             name = name[:-4]
@@ -186,15 +200,15 @@ class Arcus(device.Device):
             name = name[:-1]
 
         self._prefix = name
-        device.Device.__init__(self, name, delim='.', 
+        Device.__init__(self, name, delim='.', 
                                      attrs=self._init_list,
                                      mutable=False,
-                                     timeout=timeout)
+                                     timeout=timeout, **kwargs)
 
-        for attr in records:
-            pvrecord = name+':'+attr
-#            print 'Adding {pvrecord}'.format(pvrecord=pvrecord)
-            self.add_pv(pvrecord, attr=attr)
+#        for attr in records:
+#            pvrecord = name+':'+attr
+##            print 'Adding {pvrecord}'.format(pvrecord=pvrecord)
+#            self.add_pv(pvrecord, attr=attr)
 
          # make sure this is really a motor!
         rectype = self.get('RTYP')
@@ -208,13 +222,13 @@ class Arcus(device.Device):
                            if attr not in self._log_attrs]
 
 
-    def _newport_repr(self):
+    def _pmc100_repr(self):
         return '<Motor: {:s} = {:.2f} {:s} : {:s}>'.format(
                 self._prefix.rstrip('.'), self.VAL, self.EGU,  self.DESC)
 
     def __repr__(self):
         self.show_info()
-        return self._newport_repr()
+        return self._pmc100_repr()
 
     def __str__(self):
         return self.__repr__()
@@ -226,6 +240,8 @@ class Arcus(device.Device):
 
         if attr in self._pvs:
             return self.get(attr)
+        elif attr in self._records:
+            return self.get_device(attr)
         elif attr in self.__dict__:
             return self.__dict__[attr]
         elif self._init and not attr.startswith('__') and (self._mutable or attr in self._fields):
@@ -244,8 +260,10 @@ class Arcus(device.Device):
                     '_nonpvs', '_callbacks', '_all_attrs'):
             self.__dict__[attr] = val
             return 
+        
         if attr in self._alias:
             attr = self._alias[attr]
+        
         if attr in self._pvs:
             return self.put(attr, val)
         elif attr in self.__dict__: 
@@ -260,8 +278,9 @@ class Arcus(device.Device):
     def __dir__(self):
         # taken from device.py: there's no cleaner method to do this until Python 3.3
         all_attrs = set(self._alias.keys() + self._pvs.keys() +
+                        self._records.keys() +
                         list(self._nonpvs) + 
-                        self.__dict__.keys() + dir(epics.device.Device))
+                        self.__dict__.keys() + dir(Device))
         return list(sorted(all_attrs))
 
     def check_limits(self):
@@ -284,9 +303,11 @@ class Arcus(device.Device):
         return (val <= self.get(hl_name) and val >= self.get(ll_name))
 
     def move(self, val=None, relative=False, wait=False, timeout=300.0,
-             dial=False, step=False, raw=False,
+             dial=False,
              ignore_limits=False, confirm_move=False):
-        """ moves motor drive to position
+        """ Moves motor drive to position
+            If motor is within Target Tolerance RDBD then no move is attempted
+            and status 0 is returned immediately.
 
         arguments:
         ==========
@@ -294,8 +315,6 @@ class Arcus(device.Device):
          relative       move relative to current position    (T/F) [F]
          wait           whether to wait for move to complete (T/F) [F]
          dial           use dial coordinates                 (T/F) [F]
-         raw            use raw coordinates                  (T/F) [F]
-         step           use raw coordinates (backward compat)(T/F) [F]
          ignore_limits  try move without regard to limits    (T/F) [F]
          confirm_move   try to confirm that move has begun   (T/F) [F]
          timeout        max time for move to complete (in seconds) [300]
@@ -316,8 +335,6 @@ class Arcus(device.Device):
             4 : move-without-wait finished, soft limit violation seen
 
         """
-        step = step or raw
-
         NONFLOAT, OUTSIDE_LIMITS, UNCONNECTED = -13, -12, -11
         TIMEOUT, TIMEOUT_BUTDONE              =  -8,  -7
         UNKNOWN_ERROR                         =  -5
@@ -333,14 +350,16 @@ class Arcus(device.Device):
         drv, rbv = ('VAL', 'RBV')
         if dial:
             drv, rbv = ('DVAL', 'DRBV')
-        elif step:
-            drv, rbv = ('RVAL', 'RRBV')
 
         if relative:
             val += self.get(drv)
 
+        # If within target tolerance do not try to move.
+        if abs(val-self.get('RBV')) <= self.get('RDBD'):
+            return DONE_OK
+
         # Check for limit violations
-        if not ignore_limits and not step:
+        if not ignore_limits:
             if not self.within_limits(val, dial=dial):
                 return OUTSIDE_LIMITS
 
@@ -379,10 +398,9 @@ class Arcus(device.Device):
         return UNKNOWN_ERROR
 
 
-    def get_position(self, dial=False, readback=False, step=False, raw=False):
+    def get_position(self, dial=False, readback=False):
         """
-        Returns the target or readback motor position in user, dial or step
-        coordinates.
+        Returns the target or readback motor position in user or dial coordinates.
       
       Keywords:
          readback:
@@ -394,26 +412,17 @@ class Arcus(device.Device):
             Set dial=True to return the position in dial coordinates.
             The default is user coordinates.
             
-         raw (or step):
-            Set raw=True to return the raw position in steps.
-            The default is user coordinates.
-
          Notes:
-            The "raw" or "step" and "dial" keywords are mutually exclusive.
-            The "readback" keyword can be used in user, dial or step 
-            coordinates.
+            The "readback" keyword can be used in user or dial coordinates.
             
       Examples:
         m=epicsMotor('13BMD:m38')
         m.move(10)                   # Move to position 10 in user coordinates
         p=m.get_position(dial=True)  # Read the target position in dial coordinates
-        p=m.get_position(readback=True, step=True) # Read the actual position in steps
         """
         pos, rbv = ('VAL','RBV')
         if dial:
             pos, rbv = ('DVAL', 'DRBV')
-        elif step or raw:
-            pos, rbv = ('RVAL', 'RRBV')
         if readback:
             pos = rbv
         return self.get(pos)
@@ -445,9 +454,9 @@ class Arcus(device.Device):
         return ret
 
         
-    def set_position(self, position, dial=False, step=False, raw=False):
+    def set_position(self, position, dial=False):
         """
-      Sets the motor position in user, dial or step coordinates.
+      Sets the motor position in user or dial coordinates.
       
       Inputs:
          position:
@@ -457,19 +466,11 @@ class Arcus(device.Device):
          dial:
             Set dial=True to set the position in dial coordinates.
             The default is user coordinates.
-            
-         raw:
-            Set raw=True to set the position in raw steps.
-            The default is user coordinates.
-            
-      Notes:
-         The 'raw' and 'dial' keywords are mutually exclusive.
          
       Examples:
          m=epicsMotor('13BMD:m38')
          m.set_position(10, dial=True)   # Set the motor position to 10 in 
                                       # dial coordinates
-         m.set_position(1000, raw=True) # Set the motor position to 1000 steps
          """
 
         # Put the motor in "SET" mode
@@ -479,14 +480,28 @@ class Arcus(device.Device):
         drv = 'VAL'
         if dial:
             drv = 'DVAL'
-        elif step or raw:
-            drv = 'RVAL'
 
         self.put(drv, position)
         
         # Put the motor back in "Use" mode
         self.put('SET', 0)
-      
+     
+    def set_speed(self, speed, reverse=False, nominal_ratio=3.2):
+        """Set speed in mm/sec.
+           nominal_ratio is the nominal pulse ratio that can be tuned
+           for forward and revers with the SLRR and SLRF fields.  This
+           is left as a keyword, but should generally not be changed.
+        """
+        # make sure field is connected first with get
+        vmax = self.get('VMAX')
+        if reverse:
+            xslr = self.SLRR
+        else:
+            xslr = self.SLRF
+
+        vmax = abs(speed)/(self.ERES/1000.)*xslr/nominal_ratio
+        self.VMAX = vmax 
+
     def get_pv(self, attr):
         "return  PV for a field"
         return self.PV(attr)
@@ -542,6 +557,19 @@ class Arcus(device.Device):
         """Show all pv attributes except for log messages. 
         """
         self.show_attrs()
+
+    def show_log(self):
+        """Show motor log.
+        """
+        epics.ca.poll()
+        out = []
+        out.append(repr(self))
+        out.append("\n")
+        out.append( "--------------------------------------")
+        for attr in self._log_attrs:
+            out.append(self.get(attr, as_string=True))
+        out.append("--------------------------------------")
+        epics.ca.write("\n".join(out))
 
     def show_attrs(self, *args):
         """Show pv attributes.

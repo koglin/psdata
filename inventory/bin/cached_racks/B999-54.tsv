@@ -1,0 +1,57 @@
+		FRONT		RACK B999-R54				BACK			
+											
+82.25					47	82.25	TGH-47			SLAC ###	47
+80.50					46	80.50	PPL-45			PPL TO R58	46
+78.75	ATC-41				45	78.75					45
+77.00	1xRCE+RTM 2XCIM				44	77.00	DRL-42				44
+75.25					43	75.25					43
+73.50					42	73.50	SC3 Vacuum Controls				42
+71.75				ATCA CRATE	41	71.75	DRL-38				41
+70.00	CPC-37				40	70.00					40
+68.25	Master Timing Crate				39	68.25					39
+66.50					38	66.50	AD-261-600-73				38
+64.75				ELMA 39C 4RU	37	64.75	CBL-Manager				37
+63.00	PPL-35				36	63.00	DRL-34				36
+61.25				DAQ Crate fanouts	35	61.25	24V Parker br				35
+59.50	BNC-34				34	59.50				PHOENIX CONTACT	34
+57.75	BNC-33				33	57.75					33
+56.00					32	56.00					32
+54.25	IOC-CXI-REC-01				31	54.25	IOC-CXI-REC-01				31
+52.50	IOC-30 CVV			Supermicro	30	52.50	IOC-30 CVV                Supermicro				30
+50.75					29	50.75	PWR-26			 Leviton	29
+49.00					28	49.00					28
+47.25					27	47.25	PPL-27			Fiber	27
+45.50	SER-26			DIGI 	26	45.50	PPL-26			Fiber	26
+43.75					25	43.75					25
+42.00	DAQ-24	Cspad-1		Supermicro	24	42.00	DAQ-24	Cspad-1		Supermicro	24
+40.25	IOC-23 ATCA 			Supermicro	23	40.25					23
+38.50	DAQ-22	Cspad-2		Supermicro	22	38.50	DAQ-22	Cspad-2		Supermicro	22
+36.75					21	36.75					21
+35.00					20	35.00	PWR-20			Leviton	20
+33.25	GCT-18A		GCT-18B		19	33.25					19
+31.50		MKS 937A		MKS 937A	18	31.50					18
+29.75	GCT-16A		GCT-16B		17	29.75					17
+28.00		MKS 937A		MKS 937A	16	28.00					16
+26.25					15	26.25	PWR-15			Leviton	15
+24.50	MAG-12				14	24.50					14
+22.75					13	22.75					13
+21.00			Mag drive Shelf		12	21.00	CBL-Manager				12
+19.25					11	19.25	DRL-10				11
+17.50					10	17.50	(Vlv CTRL, ReadB, Gauge Trip PTS)				10
+15.75	FAN-08			FAN TRAY	09	15.75					09
+14.00	BNK-07				08	14.00	DRL-06				08
+12.25					07	12.25	(Vlv CTRL, ReadB, Gauge Trip PTS)				07
+10.50	PSM-04				06	10.50	Ground Bar				06
+08.75					05	08.75					05
+07.00				SLAC SD-261-200	04	07.00					04
+05.25	PSM-01				03	05.25					03
+03.50					02	03.50					02
+01.75				SLAC SD-261-200	01	01.75					01
+											
+			STANFORD LINEAR ACCELERATOR CENTER			LINAC COHERENT LIGHT SOURCE					
+			US DEPARTMENT OF ENERGY			INSTRUMENTATION & CONTROL RACKS					
+			STANFORD UNIVERSITY, STANFORD, CA			RACK B999-R54					
+ENGR		CHECKED		DATE		PRELIMINARY				A	
+DESIGNER/COORD											
+						Revision 2					
+				11/24/14							

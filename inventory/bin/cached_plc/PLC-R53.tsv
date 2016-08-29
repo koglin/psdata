@@ -1,0 +1,318 @@
+Device Section	Device Acryn	Device No.	Signal Name	PV Names	PLC IO Block	PLC Channel Input	PLC Channel Out	 I/O Block Common	Signal Common	DIN Rail Slot	Relay Slot	Relay Input	Relay Output	Trunk	Trunk Pin No.	Destination DRL	Field Device Connection	Connector	Pin No.	PLC Channel Row Number								
+INPUTS - SLOT 1																												
+			+24VDC	+24VDC					+24VDC					PLC 53A	1	R53-DRL-45	GCT-22A [CC]	Accessory	9									
+DG1	GCC	01	SP1	CXI:DG1:GCC:01:SP1_DI	Input 1	A0								PLC 53A	2	R53-DRL-45	GCT-22A [CC]	Accessory	2	4								
+			+24VDC	+24VDC					+24VDC					PLC 53A	7	R53-DRL-45	GCT-22A [B1]	Accessory	14									
+DG1	GPI	01	SP1	CXI:DG1:GPI:01:SP1_DI	Input 1	A1								PLC 53A	8	R53-DRL-45	GCT-22A [B1]	Accessory	13	6								
+			+24VDC	+24VDC					+24VDC					PLC 53A	3	R53-DRL-45	GCT-22A [A]	Accessory	11									
+KB1	GCC	01	SP1	CXI:KB1:GCC:01:SP1_DI	Input 1	A2								PLC 53A	4	R53-DRL-45	GCT-22A [A]	Accessory	10	8								
+			+24VDC	+24VDC					+24VDC					PLC 53A	9	R53-DRL-45	GCT-22A [B2]	Accessory	15									
+KB1	GPI	01	SP1	CXI:KB1:GPI:01:SP1_DI	Input 1	A3								PLC 53A	10	R53-DRL-45	GCT-22A [B2]	Accessory	7	10								
+					Input 1			CI	GND																			
+			+24VDC	+24VDC					+24VDC					PLC 53B	25	R53-DRL-45	GCT-22B [CC]	Accessory	9									
+KB1	GCC	02	SP1	CXI:KB1:GCC:02:SP1_DI	Input 1	A4								PLC 53B	26	R53-DRL-45	GCT-22B [CC]	Accessory	2	13								
+			+24VDC	+24VDC					+24VDC					PLC 53B	31	R53-DRL-45	GCT-22B [B1]	Accessory	14									
+KB1	GPI	02	SP1	CXI:KB1:GPI:02:SP1_DI	Input 1	A5								PLC 53B	32	R53-DRL-45	GCT-22B [B1]	Accessory	13	15								
+			+24VDC	+24VDC					+24VDC					PLC 53B	27	R53-DRL-45	GCT-22B [A]	Accessory	11									
+KB1	GCC	03	SP1	CXI:KB1:GCC:03:SP1_DI	Input 1	A6								PLC 53B	28	R53-DRL-45	GCT-22B [A]	Accessory	10	17								
+			+24VDC	+24VDC					+24VDC					PLC 53B	33	R53-DRL-45	GCT-22B [B2]	Accessory	15									
+KB1	GPI	03	SP1	CXI:KB1:GPI:03:SP1_DI	Input 1	A7								PLC 53B	34	R53-DRL-45	GCT-22B [B2]	Accessory	7	19								
+					Input 1			CI	GND																			
+			+24VDC	+24VDC					+24VDC					PLC 53C	1	R53-DRL-42	GCT-19A [CC]	Accessory	9									
+KB2	GCC	01	SP1	CXI:KB2:GCC:01:SP1_DI	Input 1	B0								PLC 53C	2	R53-DRL-42	GCT-19A [CC]	Accessory	2	22								
+			+24VDC	+24VDC					+24VDC					PLC 53C	7	R53-DRL-42	GCT-19A [B1]	Accessory	14									
+KB2	GPI	01	SP1	CXI:KB2:GPI:01:SP1_DI	Input 1	B1								PLC 53C	8	R53-DRL-42	GCT-19A [B1]	Accessory	13	24								
+			+24VDC	+24VDC					+24VDC					PLC 53C	3	R53-DRL-42	GCT-19A [A]	Accessory	11									
+SC2	GCC	01	SP1	CXI:SC2:GCC:01:SP1_DI	Input 1	B2								PLC 53C	4	R53-DRL-42	GCT-19A [A]	Accessory	10	26								
+			+24VDC	+24VDC					+24VDC					PLC 53C	9	R53-DRL-42	GCT-19A [B2]	Accessory	15									
+SC2	GPI	01	SP1	CXI:SC2:GPI:01:SP1_DI	Input 1	B3								PLC 53C	10	R53-DRL-42	GCT-19A [B2]	Accessory	7	28								
+					Input 1			CII	GND												OLD CONFIGURATION							
+			+24VDC	+24VDC					+24VDC					PLC 53D	31	R53-DRL-42	GCT-19B [B1]	Accessory	14		SC2	GPI	2	+24VDC				
+PI2	GPI	01	SP1	CXI:PI2:GPI:01:SP1_DI	Input 1	B4								PLC 53D	32	R53-DRL-42	GCT-19B [B1]	Accessory	13	31	SC2	GPI	2	SP1				
+			+24VDC	+24VDC					+24VDC					PLC 53D	25	R53-DRL-42	GCT-19B [CC]	Accessory	9									
+PI2	GCC	01	SP1	CXI:PI2:GCC:01:SP1_DI	Input 1	B5								PLC 53D	26	R53-DRL-42	GCT-19B [CC]	Accessory	2	33								
+			+24VDC	+24VDC					+24VDC					PLC 53D	27	R53-DRL-42	GCT-19B [A1]	Accessory	11		PI2	GPI	1	+24VDC				
+SC2	GPI	02	SP1	CXI:SC2:GPI:02:SP1_DI	Input 1	B6								PLC 53D	28	R53-DRL-42	GCT-19B [A1]	Accessory	10	35	PI2	GPI	1	SP1				
+			+24VDC	+24VDC					+24VDC					PLC 53D	29	R53-DRL-42	GCT-19B [A2]	Accessory	5									
+PI2	GPI	02	SP1	CXI:PI2:GPI:02:SP1_DI	Input 1	B7								PLC 53D	30	R53-DRL-42	GCT-19B [A2]	Accessory	12	37								
+					Input 1			CII	GND																			
+			+24VDC	+24VDC					+24VDC					PLC 53A	15	R53-DRL-45												
+DG1	VGC	01	OPN	CXI:DG1:VGC:01:OPN_DI	Input 1	C0								PLC 53A	16	R53-DRL-45				40								
+			+24VDC	+24VDC					+24VDC					PLC 53A	17	R53-DRL-45												
+DG1	VGC	01	CLS	CXI:DG1:VGC:01:CLS_DI	Input 1	C1								PLC 53A	18	R53-DRL-45				42								
+			+24VDC	+24VDC					+24VDC					PLC 53A	19	R53-DRL-45												
+DG1	VGC	02	OPN	CXI:DG1:VGC:02:OPN_DI	Input 1	C2								PLC 53A	20	R53-DRL-45				44								
+			+24VDC	+24VDC					+24VDC					PLC 53A	21	R53-DRL-45												
+DG1	VGC	02	CLS	CXI:DG1:VGC:02:CLS_DI	Input 1	C3								PLC 53A	22	R53-DRL-45				46								
+					Input 1			CIII	GND																			
+			+24VDC	+24VDC					+24VDC					PLC 53B	39	R53-DRL-45												
+KB1	VGC	01	OPN	CXI:KB1:VGC:01:OPN_DI	Input 1	C4								PLC 53B	40	R53-DRL-45				49								
+			+24VDC	+24VDC					+24VDC					PLC 53B	41	R53-DRL-45												
+KB1	VGC	01	CLS	CXI:KB1:VGC:01:CLS_DI	Input 1	C5								PLC 53B	42	R53-DRL-45				51								
+			+24VDC	+24VDC					+24VDC					PLC 53B	43	R53-DRL-45												
+KB1	VGC	02	OPN	CXI:KB1:VGC:02:OPN_DI	Input 1	C6								PLC 53B	44	R53-DRL-45				53								
+			+24VDC	+24VDC					+24VDC					PLC 53B	45	R53-DRL-45												
+KB1	VGC	02	CLS	CXI:KB1:VGC:02:CLS_DI	Input 1	C7								PLC 53B	46	R53-DRL-45				55								
+					Input 1			CIII	GND																			
+			+24VDC	+24VDC					+24VDC					PLC 53C	15	R53-DRL-42												
+KB2	VGC	01	OPN	CXI:KB2:VGC:01:OPN_DI	Input 1	D0								PLC 53C	16	R53-DRL-42				58								
+			+24VDC	+24VDC					+24VDC					PLC 53C	17	R53-DRL-42												
+KB2	VGC	01	CLS	CXI:KB2:VGC:01:CLS_DI	Input 1	D1								PLC 53C	18	R53-DRL-42				60								
+			+24VDC	+24VDC					+24VDC					PLC 53C	19	R53-DRL-42												
+KB2	VGC	02	OPN	CXI:KB2:VGC:02:OPN_DI	Input 1	D2								PLC 53C	20	R53-DRL-42				62								
+			+24VDC	+24VDC					+24VDC					PLC 53C	21	R53-DRL-42												
+KB2	VGC	02	CLS	CXI:KB2:VGC:02:CLS_DI	Input 1	D3								PLC 53C	22	R53-DRL-42				64								
+					Input 1			CIV	GND																			
+			+24VDC	+24VDC					+24VDC					PLC 53D	37	R53-DRL-42												
+SC2	VGC	02	OPN	CXI:SC2:VGC:02:OPN_DI	Input 1	D4								PLC 53D	38	R53-DRL-42				67								
+			+24VDC	+24VDC					+24VDC					PLC 53D	39	R53-DRL-42												
+SC2	VGC	02	CLS	CXI:SC2:VGC:02:CLS_DI	Input 1	D5								PLC 53D	40	R53-DRL-42				69								
+			+24VDC	+24VDC					+24VDC					PLC 53D	41	R53-DRL-42												
+SC1	VGC	02	PINOUT	CXI:SC1:VGC:02:PINOUT_DI	Input 1	D6								PLC 53D	42	R53-DRL-42												
+			+24VDC	+24VDC					+24VDC					PLC 53D	43	R53-DRL-42												
+SC1	VGC	02	PININ	CXI:SC1:VGC:02:PININ_DI	Input 1	D7								PLC 53D	44	R53-DRL-42												
+					Input 1			CIV	GND																			
+																												
+INPUTS - SLOT 6																												
+			+24VDC	+24VDC					+24VDC					PLC 53E	17	R53-DRL-42												
+SC2	PTM	02	SP1	CXI:SC2:PTM:02:SP1_DI	Input 6	A0							BLK/WHT	PLC 53E	18	R53-DRL-42												
+			+24VDC	+24VDC					+24VDC					PLC 53E	19	R53-DRL-42												
+SC2	PTM	02	FLT	CXI:SC2:PTM:02:FLT_DI	Input 6	A1							BRW/WHT	PLC 53E	20	R53-DRL-42												
+			+24VDC	+24VDC					+24VDC					PLC 53F	25	R53-DRL-42												
+SC2	VIC	03	OPN	CXI:SC2:VIC:03:OPN_DI	Input 6	A2							RED/WHT	PLC 53F	26	R53-DRL-42												
+			+24VDC	+24VDC					+24VDC					PLC 53F	27	R53-DRL-42												
+SC2	VIC	03	CLS	CXI:SC2:VIC:03:CLS_DI	Input 6	A3							ORN/WHT	PLC 53F	28	R53-DRL-42												
+					Input 6			CI	GND		GRN/WHT																	
+			+24VDC	+24VDC					+24VDC					PLC 53D	33	R53-DRL-42	GCT-19B [B2]	Accessory	15									
+SC2	GPI	03	SP1	CXI:SC2:GPI:03:SP1_DI	Input 6	A4							BLK	PLC 53D	34	R53-DRL-42	GCT-19B [B2]	Accessory	7									
+			+24VDC	+24VDC					+24VDC					PLC53E	5													
+SC2	VGC	02	PINOUT	CXI:SC2:VGC:02:PINOUT_DI	Input 6	A5							BRW	PLC53E	6													
+			+24VDC	+24VDC					+24VDC					PLC53E	15													
+SC2	VGC	02	PININ	CXI:SC2:VGC:02:PININ_DI	Input 6	A6							RED	PLC53E	16													
+									+24VDC																			
+					Input 6	A7							ORN							93								
+					Input 6			CI	GND		GRN																	
+									+24VDC																			
+					Input 6	B0							PUR/WHT							96								
+									+24VDC																			
+					Input 6	B1														98								
+									+24VDC																			
+					Input 6	B2														100								
+									+24VDC																			
+					Input 6	B3														102								
+					Input 6			CII	GND		YEL/BLK																	
+									+24VDC																			
+					Input 6	B4														105								
+									+24VDC																			
+					Input 6	B5														107								
+									+24VDC																			
+					Input 6	B6														109								
+									+24VDC																			
+					Input 6	B7														111								
+					Input 6			CII	GND		YEL																	
+									+24VDC																			
+					Input 6	C0														114								
+									+24VDC																			
+					Input 6	C1														116								
+									+24VDC																			
+					Input 6	C2														118								
+									+24VDC																			
+					Input 6	C3														120								
+					Input 6			CIII	GND																			
+									+24VDC																			
+					Input 6	C4														123								
+									+24VDC																			
+					Input 6	C5														125								
+									+24VDC																			
+					Input 6	C6														127								
+									+24VDC																			
+					Input 6	C7														129								
+					Input 6			CIII	GND																			
+									+24VDC																			
+					Input 6	D0														132								
+									+24VDC																			
+					Input 6	D1														134								
+									+24VDC																			
+					Input 6	D2														136								
+									+24VDC																			
+					Input 6	D3														138								
+					Input 6			CIV	GND																			
+									+24VDC																			
+					Input 6	D4														141								
+									+24VDC																			
+					Input 6	D5														143								
+									+24VDC																			
+					Input 6	D6														145								
+									+24VDC																			
+					Input 6	D7														147								
+					Input 6			CIV	GND																			
+																												
+OUTPUTS																												
+DG1	GCC	01	ENBL	CXI:DG1:GCC:01:ENBL_DO	Output 1		A0			1	17	+A1								151								
+									GND	1	17	-A2																
+DG1	GCC	01	ENBL		Output 1					1	17		11	PLC 53A	11	R53-DRL-45	GCT-22A [CC]	Remote	A									1
+										1	17		14	PLC 53A	12	R53-DRL-45	GCT-22A [CC]	Remote	D									2
+																												
+KB1	GCC	01	ENBL	CXI:KB1:GCC:01:ENBL_DO	Output 1		A1			1	18	+A1								156								
+									GND	1	18	-A2																
+KB1	GCC	01	ENBL		Output 1					1	18		11	PLC 53A	13	R53-DRL-45	GCT-22A [A]	Remote	A									1
+										1	18		14	PLC 53A	14	R53-DRL-45	GCT-22A [A]	Remote	D									2
+																												
+KB1	GCC	02	ENBL	CXI:KB1:GCC:02:ENBL_DO	Output 1		A2			1	19	+A1								161								
+									GND	1	19	-A2																
+KB1	GCC	02	ENBL		Output 1					1	19		11	PLC 53B	35	R53-DRL-45	GCT-22B [CC]	Remote	A									
+										1	19		14	PLC 53B	36	R53-DRL-45	GCT-22B [CC]	Remote	D									
+																												
+KB1	GCC	03	ENBL	CXI:KB1:GCC:03:ENBL_DO	Output 1		A3			1	20	+A1								166								
+									GND	1	20	-A2																
+KB1	GCC	03	ENBL		Output 1					1	20		11	PLC 53B	37	R53-DRL-45	GCT-22B [A]	Remote	A									
+										1	20		14	PLC 53B	38	R53-DRL-45	GCT-22B [A]	Remote	D									
+																												
+KB2	GCC	01	ENBL	CXI:KB2:GCC:01:ENBL_DO	Output 1		A4			1	21	+A1								171								
+									GND	1	21	-A2																
+KB2	GCC	01	ENBL		Output 1					1	21		11	PLC 53C	11	R53-DRL-42	GCT-19A [CC]	Remote	A									
+										1	21		14	PLC 53C	12	R53-DRL-42	GCT-19A [CC]	Remote	D									
+																												
+SC2	GCC	01	ENBL	CXI:SC2:GCC:01:ENBL_DO	Output 1		A5			1	22	+A1								176								
+									GND	1	22	-A2																
+SC2	GCC	01	ENBL		Output 1					1	22		11	PLC 53C	13	R53-DRL-42	GCT-19A [A]	Remote	A									
+										1	22		14	PLC 53C	14	R53-DRL-42	GCT-19A [A]	Remote	D									
+																												
+PI2	GCC	01	ENBL	CXI:PI2:GCC:01:ENBL_DO	Output 1		A6			1	23	+A1								181								
+									GND	1	23	-A2																
+PI2	GCC	01	ENBL		Output 1					1	23		11	PLC 53D	35	R53-DRL-42	GCT-19B [CC]	Remote	A									
+										1	23		14	PLC 53D	36	R53-DRL-42	GCT-19B [CC]	Remote	D									
+																												
+DG1	VGC	01	OPN	CXI:DG1:VGC:01:OPN_DO	Output 1		A7			1	24	+A1								186								
+									GND	1	24	-A2																
+									+24VDC	1	24		11															
+DG1	VGC	01	OPN							1	24		14	PLC 53A	23	R53-DRL-45												1
+									GND					PLC 53A	24	R53-DRL-45												2
+					Output 1			CI	GND																			
+					Output 1			VI	+24VDC																			
+DG1	VGC	02	OPN	CXI:DG1:VGC:02:OPN_DO	Output 1		B0			1	25	+A1								193								
+									GND	1	25	-A2																
+									+24VDC	1	25		11															
+DG1	VGC	02	OPN							1	25		14	PLC 53B	47	R53-DRL-45												
+									GND					PLC 53B	48	R53-DRL-45												
+KB1	VGC	01	OPN	CXI:KB1:VGC:01:OPN_DO	Output 1		B1			1	26	+A1								198								
+									GND	1	26	-A2																
+									+24VDC	1	26		11															
+KB1	VGC	01	OPN							1	26		14	PLC 53C	23	R53-DRL-42												
+									GND					PLC 53C	24	R53-DRL-42												
+KB1	VGC	02	OPN	CXI:KB1:VGC:02:OPN_DO	Output 1		B2			1	27	+A1								203								
+									GND	1	27	-A2																
+									+24VDC	1	27		11															
+KB1	VGC	02	OPN		Output 1					1	27		14	PLC 53D	45	R53-DRL-42												
+									GND					PLC 53D	46	R53-DRL-42												
+KB2	VGC	01	OPN	CXI:KB2:VGC:01:OPN_DO	Output 1		B3			1	28	+A1								208								
+									GND	1	28	-A2																
+									+24VDC	1	28		11															
+KB2	VGC	01	OPN		Output 1					1	28		14	PLC 53D	47	R53-DRL-42												
+									GND					PLC 53D	48	R53-DRL-42												
+SC2	VGC	01	OPN	CXI:SC2:VGC:01:OPN_DO	Output 1		B4			1	29	+A1								213								
+									GND	1	29	-A2																
+									+24VDC	1	29		11															
+SC2	VGC	01	OPN		Output 1					1	29		14	PLC 53E	1	R53-DRL-44												
+									GND					PLC 53E	2	R53-DRL-44												
+SC2	VGC	02	OPN	CXI:SC2:VGC:02:OPN_DO	Output 1		B5			1	30	+A1								218								
+									GND	1	30	-A2																
+									+24VDC	1	30		11															
+SC2	VGC	02	OPN		Output 1					1	30		14	PLC 53E	3	R53-DRL-44												
+									GND					PLC 53E	4	R53-DRL-44												
+SC2	VGC	03	OPN	CXI:SC2:VGC:03:OPN_DO	Output 1		B6			1	31	+A1								223								
+									GND	1	31	-A2																
+									+24VDC	1	31		11															
+SC2	VGC	03	OPN		Output 1					1	31		14	PLC 53E	5	R53-DRL-44												
+									GND					PLC 53E	6	R53-DRL-44												
+SC2	VCC	01	OPN	CXI:SC2:VCC:01:OPN_DO	Output 1		B7			1	32	+A1								228								
+									GND	1	32	-A2																
+									+24VDC	1	32		11															
+SC2	VCC	01	OPN		Output 1					1	32		14	PLC 53E	7	R53-DRL-44												
+									GND					PLC 53E	8	R53-DRL-44												
+					Output 1			CII	GND																			
+					Output 1			VII	+24VDC																			
+SC2	VCC	02	OPN	CXI:SC2:VCC:02:OPN_DO	Output 1		C0			1	33	+A1								235								
+									GND	1	33	-A2																
+									+24VDC	1	33		11															
+SC2	VCC	02	OPN		Output 1					1	33		14	PLC 53E	9	R53-DRL-44												
+									GND					PLC 53E	10	R53-DRL-44												
+SC2	VIC	03	OPN	CXI:SC2:VIC:03:OPN_DO	Output 1		C1			1	34	+A1								240								
+									GND	1	34	-A2																
+									+24VDC	1	34		11															
+SC2	VIC	03	OPN		Output 1					1	34		14	PLC 53E	11	R53-DRL-44												
+									GND					PLC 53E	12	R53-DRL-44												
+SC2	VIC	01	OPN	CXI:SC2:VIC:01:OPN_DO	Output 1		C2			1	35	+A1								245								
+									GND	1	35	-A2																
+									+24VDC	1	35		11															
+SC2	VIC	01	OPN		Output 1					1	35		14	PLC 53E	13	R53-DRL-44												
+									GND					PLC 53E	14	R53-DRL-44												
+SC2	VIC	02	OPN	CXI:SC2:VIC:02:OPN_DO	Output 1		C3			1	36	+A1								250								
+									GND	1	36	-A2																
+									+24VDC	1	36		11															
+SC2	VIC	02	OPN		Output 1					1	36		14	PLC 53E	15	R53-DRL-44												
+									GND					PLC 53E	16	R53-DRL-44												
+SC2	PTM	02	RUN	CXI:SC2:PTM:02:RUN_DO	Output 1		C4			1	37	+A1								255								
+									GND	1	37	-A2																
+										1	37		11															
+SC2	PTM	02	RUN		Output 1					1	37		14	PLC 53E	21	R53-DRL-44												
+														PLC 53E	22	R53-DRL-44												
+SC2	PTM	02	SST	CXI:SC2:PTM:02:SST_DO	Output 1		C5			1	38	+A1								260								
+									GND	1	38	-A2																
+										1	38		11															
+SC2	PTM	02	SST		Output 1					1	38		14	PLC 53E	23	R53-DRL-44												
+														PLC 53E	24	R53-DRL-44												
+SC2	VCC	03	OPN	CXI:SC2:VCC:03:OPN_DO	Output 1		C6			1	39	+A1								265								
+									GND	1	39	-A2																
+									+24VDC	1	39		11															
+SC2	VCC	03	OPN		Output 1					1	39		14	PLC 53F	29	R53-DRL-44												
+														PLC 53F	30	R53-DRL-44												
+					Output 1		C7					+A1								270								
+									GND			-A2																
+													11															
+													14															
+																												
+								CIII	GND																			
+								VIII	+24VDC																			
+					Output 1		D0					+A1								277								
+									GND			-A2																
+													11															
+													14															
+																												
+					Output 1		D1					+A1								282								
+									GND			-A2																
+													11															
+													14															
+																												
+					Output 1		D2					+A1								287								
+									GND			-A2																
+													11															
+													14															
+																												
+					Output 1		D3					+A1								292								
+									GND			-A2																
+													11															
+													14															
+																												
+					Output 1		D4					+A1								297								
+									GND			-A2																
+													11															
+													14															
+																												
+					Output 1		D5					+A1								302								
+									GND			-A2																
+													11															
+													14															
+																												
+					Output 1		D6					+A1								307								
+									GND			-A2																
+													11															
+													14															
+																												
+					Output 1		D7					+A1								312								
+									GND			-A2																
+													11															
+													14															
+																												
+					Output 1			CIV	GND																			
+					Output 1			VIV	+24VDC																			

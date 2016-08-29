@@ -11,7 +11,7 @@
 import sys
 import time
 import epics 
-import device
+from lcls_devices import Device
 
 class NewportLimitException(Exception):
     """ raised to indicate a motor limit has been reached """
@@ -29,7 +29,7 @@ class NewportException(Exception):
     def __str__(self):
         return str(self.msg)
 
-class Newport(device.Device):
+class Newport(Device):
     """Epics Newport Motor Class for pyepics3
    
    !!!! WARNING -- Hacked from General Motor Record  
@@ -129,20 +129,26 @@ class Newport(device.Device):
         'slew_speed':             ('VELO', 'Velocity (EGU/s) '),
         'version':                ('VERS', 'Code Version '),
         'record_type':            ('RTYP', 'Record Type'),
-        'status':                 ('STAT', 'Status')
-    }
-    records = {
-#       'reverse_means':          ('REV_MEANS', 'Reverse means'),
-#       'forward_means':          ('FW_MEANS', 'Forward means'),
-#       'tweak_forward':          ('TWF',  'Tweak motor Forward '),
-#       'tweak_reverse':          ('TWR',  'Tweak motor Reverse ')
+        'motor_type':             ('TYPE', 'Motor Type'),
+        'status':                 ('STAT', 'Status'),
+        'host':                   ('HOST', 'Name of Host Machine'),
+        'card':                   ('CARD', 'Card on XPS'),
+        'ioc_name':               ('IOCN', 'IOC PV Name'),
+        'home_type':              ('HTYP', 'Home Type'),
+        'log_a':                  ('LOGA', 'Log A'),
+        'log_b':                  ('LOGB', 'Log B'),
+        'log_c':                  ('LOGC', 'Log C'),
+        'log_d':                  ('LOGD', 'Log D'),
+        'log_e':                  ('LOGE', 'Log E'),
+        'log_f':                  ('LOGF', 'Log F'),
+        'log_g':                  ('LOGG', 'Log G'),
+        'log_h':                  ('LOGH', 'Log H')
     }
     config = ['DESC','PREC','EGU','DTYP','VERS','TYPE']
 
     _attr_tuple = {}
     _alias = {}
     _fields = {}
-    _records = {}
     _mutable = False
 
     _nonpvs = ('_prefix', '_pvs', '_delim', '_init', '_init_list',
@@ -154,16 +160,15 @@ class Newport(device.Device):
 
         
     def __init__(self, name=None, 
-                 fields=fields, records=records, 
-                 mutable=False, timeout=3.0):
+                 fields=fields, 
+                 mutable=False, timeout=3.0, **kwargs):
         if name is None:
             raise NewportException("must supply motor name")
 
-        self._attr_tuple = dict(records.items() + fields.items())
-        self._alias = {item[0]: item[1][0] for item in records.items() + fields.items()}
+        self._attr_tuple = dict(fields.items())
+        self._alias = {item[0]: item[1][0] for item in fields.items()}
 
         self._fields = [item[1][0] for item in fields.items()]
-        self._records = [item[1][0] for item in records.items()]
 
         if name.endswith('.VAL'):
             name = name[:-4]
@@ -171,15 +176,10 @@ class Newport(device.Device):
             name = name[:-1]
 
         self._prefix = name
-        device.Device.__init__(self, name, delim='.', 
+        Device.__init__(self, name, delim='.', 
                                      attrs=self._init_list,
                                      mutable=False,
-                                     timeout=timeout)
-
-        for attr in records:
-            pvrecord = name+':'+attr
-#            print 'Adding {pvrecord}'.format(pvrecord=pvrecord)
-            self.add_pv(pvrecord, attr=attr)
+                                     timeout=timeout, **kwargs)
 
          # make sure this is really a motor!
         rectype = self.get('RTYP')
@@ -246,7 +246,7 @@ class Newport(device.Device):
         # taken from device.py: there's no cleaner method to do this until Python 3.3
         all_attrs = set(self._alias.keys() + self._pvs.keys() +
                         list(self._nonpvs) + 
-                        self.__dict__.keys() + dir(epics.device.Device))
+                        self.__dict__.keys() + dir(Device))
         return list(sorted(all_attrs))
 
     def check_limits(self):
@@ -582,3 +582,46 @@ if (__name__ == '__main__'):
     for arg in sys.argv[1:]:
         m = Motor(arg)
         m.show_info()
+
+#dbpr CXI:DSC:MMN:02 10
+#ACCL: 4             ACKS: MAJOR         ACKT: YES           ADEL: 0             
+#ALST: 0             ASG:                ASP: (nil)          BDST: 0             
+#BKPT: 00            BL: Disable         BUTC: 3             CARD: 1             
+#CMAP: 0             DESC: NS Waveplate DG3 table            DHLM: 1000000       
+#DIFF: 0             DIR: Pos            DISA: 0             DISP: 0             
+#DISS: NO_ALARM      DISV: 1             DLLM: -1000000      DLVL: 0             
+#DMOV: 1             DPVT: 0xc2c3d10     DRBV: 0             DSET: (nil)         
+#DSTA: 0             DSTR: 0xc2c3b90     DTYP: <nil>         DVAL: 0             
+#EGU:               ERR: 0              ESTR: 0xc2c3cb0     EVNT: 0             
+#FLNK:DB_LINK CXI:DSC:MMN:02:TS          HACC: 2             HHSV: NO_ALARM      
+#HIGH: 0             HIHI: 0             HLM: 25             HLS: 0              
+#HLSV: NO_ALARM      HOME: 1             HOST: ioc-cxi-misc1 HSET: 0             
+#HSTA: 4194304       HSTR: 0xc2c3bf0     HSV: NO_ALARM       
+#HTYP: MechanicalZeroHomeSearch          HVEL: 2             INIT: 1             
+#IOCN: ioc-cxi-xps-det1                  KILL: 0             LCNT: 0             
+#LLM: 0              LLS: 0              LLSV: NO_ALARM      LOGA: 0xc2c40a0     
+#LOGB: 0xc2c40dd     LOGC: 0xc2c411a     LOGD: 0xc2c4157     LOGE: 0xc2c4194     
+#LOGF: 0xc2c41d1     LOGG: 0xc2c420e     LOGH: 0xc2c424b     LOLO: 0             
+#LOW: 0              LSET: 0xc2c9eb0     LSV: NO_ALARM       LVIO: 0             
+#MAXJ: 0.05          MDEL: 0             MINJ: 0.005         MIP: 0              
+#MISS: 0             
+#MLIS: c0 4a 32 0c 00 00 00 00 60 6a 3c 0c 00 00 00 00 78 00 00 00               
+#MLOK: 70 f8 2b 0c 00 00 00 00           MLST: 0             MOVN: 0             
+#MSTA: 2             NAME: CXI:DSC:MMN:02                    NSEV: NO_ALARM      
+#NSTA: NO_ALARM      OFF: 0              OVAL: 0             PACT: 0             
+#PDBD: 0.01          PHAS: 0             PINI: NO            PPN: (nil)          
+#PPNR: (nil)         PREC: 3             PRIO: LOW           PROC: 0             
+#PTYP: SR50CC        PUTF: 0             RBV: 0              RCNT: 0             
+#RCON: 0             RDBD: 1.0e-03       RDES: 0xc242230     REF2: 0             
+#REFR: 0             RPRO: 0             RSET: 0x773160      RTRY: 3             
+#SACC: 4             SCAN: Passive       SDFT: 0             SDIS:CONSTANT       
+#SET: Use            SEVR: NO_ALARM      SHAC: 2             SHJ: 0.05           
+#SHLM: 1000000       SHVE: 2             SLJ: 0.005          SLLM: -1000000      
+#SNUM: 12            SPG: Go             SPVT: (nil)         SSTR: 0xc2c3c50     
+#STAT: NO_ALARM      STOP: 0             STUP: 1             SVEL: 4             
+#TIME: 2015-10-08 16:50:32.785104000     TPRO: 0             TSE: 0              
+#TSEL:CONSTANT       TWF: 1              TWR: 1              TWV: 1              
+#TYPE: SR50CC        UDF: 0              UINT: 0.3           VAL: 0              
+#VELO: 4             
+
+

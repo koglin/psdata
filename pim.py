@@ -10,10 +10,13 @@ class pim(psdata.Detector):
     def __init__(self,*args,**kwargs):
 
         psdata.Detector.__init__(self,*args,**kwargs)
-        self.pedestal = 0
-        self.vmin = -50
-        self.vmax = 50
-        self.roi = None
+        
+        init_params = {'pedestal': 0, 'roi': None}
+        self.set_parameter(**init_params)
+
+        pvbase = kwargs.get('pvbase')
+        if pvbase:
+            self.add_device(yag=pvbase+':YAG',zoom=pvbase+':ZOOM')
 
     @property
     def raw_image(self):
@@ -21,7 +24,20 @@ class pim(psdata.Detector):
            This could in the future be updated to take other types of data
            including epics.
         """
-        return self.data16
+        if self.detector:
+            if self.detector.image:
+                return self.detector.image
+            elif self.detector.calib:
+                return self.detector.calib
+            else:
+                return self.detector.raw
+
+        elif self.eventData:
+            return self.data16
+        elif self.ami: 
+            return self.ami.data
+        else:
+            return None
 
     @property
     def calibrated_image(self):
@@ -69,10 +85,10 @@ class pim(psdata.Detector):
 
         self.pedestal /= float(nevents)
 
-    def new_plot(self):
+    def new_plot(self, **kwargs):
         plt.ion()
         plt.imshow(self.image)
-        plt.clim(vmin=self.vmin,vmax=self.vmax)
+        plt.clim(**kwargs)
         plt.colorbar()
         plt.title(self.desc)
 
@@ -88,7 +104,7 @@ class pim(psdata.Detector):
                     self._data.next_event()
                 
                 if projection:
-                    if projection is 'y':
+                    if projection in ['y', 'yprojection', 'Y']:
                         plotdata = self.yprojection
                     else:
                         plotdata = self.xprojection
@@ -105,7 +121,7 @@ class pim(psdata.Detector):
     
     def publish(self, name=None, title=None,
                 projection=None, 
-                start=True, stop=False):
+                start=True, stop=False, local=True, **kwargs):
         """Publish plot with psmon.
            Plot can be read on multiple machines with psplot.
         """
@@ -137,11 +153,11 @@ class pim(psdata.Detector):
         if start:
             if projection:
                 self.add_psplot(plotdata, plot_type='XYplot', 
-                                name=name, title=title)
+                                name=name, title=title, local=local, **kwargs)
             
             else:
                 self.add_psplot('image', plot_type='Image', 
-                                name=name, title=title)
+                                name=name, tle=title, local=local, **kwargs)
         
         if stop:
             self.del_psplot(name)

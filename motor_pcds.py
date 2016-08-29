@@ -11,7 +11,7 @@
 import sys
 import time
 import epics 
-import device
+from lcls_devices import Device
 
 class MotorLimitException(Exception):
     """ raised to indicate a motor limit has been reached """
@@ -29,7 +29,7 @@ class MotorException(Exception):
     def __str__(self):
         return str(self.msg)
 
-class Motor(device.Device):
+class Motor(Device):
     """Epics Motor Motor Class for pyepics3
    
    !!!! WARNING -- Hacked from General Motor Record / IMS Record 
@@ -94,6 +94,8 @@ class Motor(device.Device):
     #
     fields = {
        'acceleration':           ('ACCL', 'acceleration time'),
+       'back_velocity':          ('BVEL', 'back velocity'),
+       'back_acceleration':      ('BACC', 'back acceleration'),
        'backlash':               ('BDST', 'backlash distance'),
        'description':            ('DESC', 'Description'),
        'dial_high_limit':        ('DHLM', 'Dial High Limit '),
@@ -152,40 +154,39 @@ class Motor(device.Device):
        'device_type':            ('DTYP', 'Device Type'),
        'status':                 ('STAT', 'Status')
     }
-    records = {
+#    records = {
+#       'zero_all':               ('SET_ZERO', 'Zero all the position values'),
 #       'reverse_means':          ('REV_MEANS', 'Reverse means'),
 #       'forward_means':          ('FW_MEANS', 'Forward means'),
 #       'tweak_forward':          ('TWF',  'Tweak motor Forward '),
 #       'tweak_reverse':          ('TWR',  'Tweak motor Reverse ')
-    }
+#    }
 
     config = ['DESC','PREC','EGU','DTYP','VERS']
 
     _attr_tuple = {}
     _alias = {}
     _fields = {}
-    _records = {}
     _mutable = False
 
     _nonpvs = ('_prefix', '_pvs', '_delim', '_init', '_init_list',
-               '_alias', '_fields', '_records')
+               '_alias', '_fields', '_records', '_info_records')
     _info_attrs = ['DESC', 'VAL', 'RBV', 'EGU', 'PREC', 'VELO', 'ACCL',
                                'STAT', 'TWV','LLM', 'HLM', 'RTYP'] 
     _log_attrs = []
     _init_list = _info_attrs
+    _info_records = []
 
-        
     def __init__(self, name=None, 
-                 fields=fields, records=records, 
-                 mutable=False, timeout=3.0):
+                 fields=fields,
+                 mutable=False, timeout=3.0, **kwargs):
         if name is None:
             raise MotorException("must supply motor name")
 
-        self._attr_tuple = dict(records.items() + fields.items())
-        self._alias = {item[0]: item[1][0] for item in records.items() + fields.items()}
+        self._attr_tuple = dict(fields.items())
+        self._alias = {item[0]: item[1][0] for item in fields.items()}
 
         self._fields = [item[1][0] for item in fields.items()]
-        self._records = [item[1][0] for item in records.items()]
 
         if name.endswith('.VAL'):
             name = name[:-4]
@@ -193,15 +194,19 @@ class Motor(device.Device):
             name = name[:-1]
 
         self._prefix = name
-        device.Device.__init__(self, name, delim='.', 
+        Device.__init__(self, name, delim='.', 
                                      attrs=self._init_list,
                                      mutable=False,
-                                     timeout=timeout)
+                                     timeout=timeout, **kwargs)
 
-        for attr in records:
-            pvrecord = name+':'+attr
-#            print 'Adding {pvrecord}'.format(pvrecord=pvrecord)
-            self.add_pv(pvrecord, attr=attr)
+        self._info_records = self._records.keys() 
+
+#        for alias, item in records.items():
+#            attr = item[0]
+#            self._alias[alias] = attr
+#            pvrecord = name+':'+attr
+##            print 'Adding {pvrecord}'.format(pvrecord=pvrecord)
+#            self.add_pv(pvrecord, attr=attr)
 
          # make sure this is really a motor!
         rectype = self.get('RTYP')
@@ -232,6 +237,8 @@ class Motor(device.Device):
 
         if attr in self._pvs:
             return self.get(attr)
+        elif attr in self._records:
+            return self.get_device(attr)
         elif attr in self.__dict__:
             return self.__dict__[attr]
         elif self._init and not attr.startswith('__') and (self._mutable or attr in self._fields):
@@ -266,8 +273,9 @@ class Motor(device.Device):
     def __dir__(self):
         # taken from device.py: there's no cleaner method to do this until Python 3.3
         all_attrs = set(self._alias.keys() + self._pvs.keys() +
+                        self._info_records +
                         list(self._nonpvs) + 
-                        self.__dict__.keys() + dir(epics.device.Device))
+                        self.__dict__.keys() + dir(Device))
         return list(sorted(all_attrs))
 
     def check_limits(self):

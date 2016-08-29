@@ -1,0 +1,60 @@
+		FRONT		RACK B999-R59				BACK			
+											
+82.25					47	82.25					47
+80.50	DRL-45			MPS TRK (TO 999-R59)	46	80.50					46
+78.75				SLAC AD-261-600-77	45	78.75	ESW-45			FIBER	45
+77.00					44	77.00	PPL-44			FIBER	44
+75.25					43	75.25	TGH-43			SLAC ###	43
+73.50	DAQ-42	cam03		Supermicro	42	73.50					42
+71.75	DAQ-41	cam04		Supermicro	41	71.75					41
+70.00	DAQ-40	Cspad3		Supermicro	40	70.00					40
+68.25	DAQ-39	Cspad4		Supermicro	39	68.25					39
+66.50					38	66.50					38
+64.75	IOC-CXI-CAM4				37	64.75					37
+63.00	IOC-36			Supermicro	36	63.00					36
+61.25	IOC-CXI-CAM5				35	61.25					35
+59.50	IOC-34			Supermicro	34	59.50					34
+57.75					33	57.75					33
+56.00					32	56.00	PWR-32			Leviton	32
+54.25					31	54.25	TGH-31			SLAC ###	31
+52.50					30	52.50	DRL-28				30
+50.75					29	50.75	camera, IMB,  LED,Beckhoff				29
+49.00					28	49.00				Phx Con	28
+47.25					27	47.25	PPL-27			ENET	27
+45.50	FAN-26			FAN TRAY	26	45.50					26
+43.75	BNK-25				25	43.75	DRL-24				25
+42.00					24	42.00	Vlv control, ReadB, GCC trip PTS				24
+40.25					23	40.25	TGH-23			SLAC ###	23
+38.50					22	38.50	DRL-21				22
+36.75					21	36.75	Vlv control, ReadB, GCC trip PTS				21
+35.00	MKS Cbl Mgr		MKS Cbl Mgr		20	35.00					20
+33.25	GCT-18A		GCT-18B		19	33.25					19
+31.50		MKS 937A		MKS 937A	18	31.50					18
+29.75					17	29.75					17
+28.00					16	28.00					16
+26.25					15	26.25	PWR-15			Leviton	15
+24.50	MCC-13				14	24.50					14
+22.75	(Mforce 2xB)			SLAC SD-261-201	13	22.75					13
+21.00	PSM-10				12	21.00	DRL-10				12
+19.25					11	19.25	+24DVC PARKER BR				11
+17.50				SLAC SD-261-200	10	17.50				261-600-51	10
+15.75	FAN-09			FAN TRAY	09	15.75					09
+14.00	BNK-08				08	14.00					08
+12.25	PSM-05				07	12.25					07
+10.50					06	10.50					06
+08.75				SLAC SD-261-200	05	08.75					05
+07.00	SER-04			Digi TS16MEI	04	07.00					04
+05.25					03	05.25					03
+03.50					02	03.50					02
+01.75					01	01.75					01
+											
+			STANFORD LINEAR ACCELERATOR CENTER			LINAC COHERENT LIGHT SOURCE					
+			US DEPARTMENT OF ENERGY			INSTRUMENTATION & CONTROL RACKS					
+			STANFORD UNIVERSITY, STANFORD, CA			RACK B999-R59					
+ENGR		CHECKED		DATE		PRELIMINARY				A	
+DESIGNER/COORD											
+				11/1/2010		Revision 2					
+F. PRADO				4/4/2014							
+											
+											
+NOTE: GREEN means changes/updates 											

@@ -11,7 +11,7 @@
 import sys
 import time
 import epics 
-import device
+from lcls_devices import Device
 
 def onChangeMovingStatus(pvname=None, value=None, char_value=None, **kw):
     current_time = kw['timestamp']
@@ -39,7 +39,7 @@ class ImsException(Exception):
     def __str__(self):
         return str(self.msg)
 
-class IMS(device.Device):
+class IMS(Device):
     """Epics IMS Motor Class for pyepics3
 
    UNDER DEVELOPMENT!!! 
@@ -179,6 +179,7 @@ class IMS(device.Device):
         'encoder_enabled':        ('EE', 'Encoder  '),
         'hold_current':           ('HC', 'Hold Current  '),
         'run_current':            ('RC', 'Run Current  '),
+        'restore_hold_current':   ('HCTG', 'Restore/Zero Holding Current'),
         'encoderlines':           ('EL', 'Encoder Lines (encoder counts/motor turn/4.)'),
         'limitmode':              ('LM', 'Limit Mode'),
         'hold_current_time':      ('HT', 'Motor Hold Current Time'),
@@ -186,10 +187,12 @@ class IMS(device.Device):
         'microsteps':             ('MS', 'Microsteps'),
         'stallfactor':            ('SF', 'Stall Factor'),
         'stallmode':              ('SM', 'Stall Mode'),
-        'mcode_s1':               ('S1', 'Switch 1 (CW) setting'),
-        'mcode_s2':               ('S2', 'Switch 2 (CCW) setting'),
-        'mcode_s3':               ('S3', 'Switch 3 Encoder Power'),
-        'mcode_s4':               ('S4', 'Switch 4 Homing Switch'),
+        's1':                     ('S1', 'Switch 1 (CW) setting'),
+        's2':                     ('S2', 'Switch 2 (CCW) setting'),
+        's3':                     ('S3', 'Switch 3 Encoder Power'),
+        's4':                     ('S4', 'Switch 4 Homing Switch'),
+        'CMD':                    ('CMD', 'Mcode Command'),
+        'RESP':                   ('RESP', 'Mcode Response'),
         'log_a':                  ('LOGA', 'Log A'),
         'log_b':                  ('LOGB', 'Log B'),
         'log_c':                  ('LOGC', 'Log C'),
@@ -202,43 +205,43 @@ class IMS(device.Device):
 
     config = ['DESC','PREC','EGU','DTYP','PN','SN','VERS']
 
-    records = {
-        'STATUS':                 ('STATUS',     'IMS Status'),
-        'cfg_file':               ('CFG_FILE',   'Configuration File'),
-        'time_stamp':             ('TS',         'Time Stamp'),
-        'utc_string':             ('UTCS',       'UTC String'),
-        'utc':                    ('UTC',        'UTC'),
-        'reverse_means':          ('REV_MEANS',  'Reverse Means'),
-        'forward_means':          ('FW_MEANS',   'Forward Means'),
-        'seq_seln':               ('SEQ_SELN',   'Sequence Selection'),
-    }
+#    records = {
+#        'STATUS':                 ('STATUS',     'IMS Status'),
+#        'cfg_file':               ('CFG_FILE',   'Configuration File'),
+#        'time_stamp':             ('TS',         'Time Stamp'),
+#        'utc_string':             ('UTCS',       'UTC String'),
+#        'utc':                    ('UTC',        'UTC'),
+#        'reverse_means':          ('REV_MEANS',  'Reverse Means'),
+#        'forward_means':          ('FW_MEANS',   'Forward Means'),
+#        'seq_seln':               ('SEQ_SELN',   'Sequence Selection'),
+#        'update_status_proc':     ('UPDATE_STATUS.PROC', 'Update Status Procedure'),
+#    }
 
     _attr_tuple = {}
     _alias = {}
     _fields = {}
-    _records = {}
     _mutable = False
 
     _nonpvs = ('_prefix', '_pvs', '_delim', '_init', '_init_list',
                '_alias', '_fields', '_records', '_all_attrs')
     _log_attrs = ['LOGA', 'LOGB', 'LOGC', 'LOGD', 'LOGE', 'LOGF', 'LOGG', 'LOGH']
-    _info_attrs = ['DESC', 'VAL', 'RBV', 'EGU', 'PREC', 'VELO', 'ACCL', 
-                   'STAT', 'TWV','LLM', 'HLM', 'EE', 'RC', 'HC', 'RTYP']
-    _init_list = _info_attrs
+    _info_attrs = ['DESC', 'NAME', 'VAL', 'RBV', 'EGU', 'PREC', 'VELO', 'ACCL', 'DIR', 
+                   'STAT', 'TWV','LLM', 'HLM', 'EE', 'RC', 'HC', 'PORT', 'RTYP', 'VERS']
+    _init_list = ['DESC', 'VAL', 'RBV', 'EGU', 'PREC', 'RTYP']
     _all_attrs = []
     _omit_attrs = ['TS','IOCN']
 
     def __init__(self, name=None, 
-                 fields=fields, records=records, 
-                 mutable=False, timeout=3.0):
+#                 fields=fields, records=records, 
+                 fields=fields, 
+                 mutable=False, timeout=3.0, **kwargs):
         if name is None:
             raise ImsException("must supply motor name")
 
-        self._attr_tuple = dict(records.items() + fields.items())
-        self._alias = {item[0]: item[1][0] for item in records.items() + fields.items()}
+        self._attr_tuple = dict(fields.items())
+        self._alias = {item[0]: item[1][0] for item in fields.items()}
 
         self._fields = [item[1][0] for item in fields.items()]
-        self._records = [item[1][0] for item in records.items()]
 
         self._all_attrs = [attr for attr in self._alias.values()
                            if attr not in self._log_attrs and attr not in self._omit_attrs]
@@ -249,16 +252,16 @@ class IMS(device.Device):
             name = name[:-1]
 
         self._prefix = name
-        device.Device.__init__(self, name, delim='.', 
+        Device.__init__(self, name, delim='.', 
 #                                     attrs=self._fields,
                                      attrs=self._init_list,
                                      mutable=False,
-                                     timeout=timeout)
+                                     timeout=timeout, **kwargs)
 
-        for attr in self._records:
-            pvrecord = name+':'+attr
-#            print 'Adding {pvrecord}'.format(pvrecord=pvrecord)
-            self.add_pv(pvrecord, attr=attr)
+#        for attr, pvrecord in self._records.items():
+##            pvrecord = name+':'+attr
+##            print 'Adding {pvrecord}'.format(pvrecord=pvrecord)
+#            self.add_pv(pvrecord, attr=attr)
 
          # make sure this is really a motor!
         rectype = self.get('RTYP')
@@ -287,6 +290,8 @@ class IMS(device.Device):
 
         if attr in self._pvs:
             return self.get(attr)
+        elif attr in self._records:
+            return self.get_device(attr)
         elif attr in self.__dict__:
             return self.__dict__[attr]
         elif self._init and not attr.startswith('__') and (self._mutable or attr in self._fields):
@@ -321,10 +326,16 @@ class IMS(device.Device):
     def __dir__(self):
         # taken from device.py: there's no cleaner method to do this until Python 3.3
         all_attrs = set(self._alias.keys() + self._pvs.keys() +
-                        self._fields + self._records +
+                        self._fields +
+                        self._records.keys() +
                         list(self._nonpvs) + 
-                        self.__dict__.keys() + dir(device.Device))
+                        self.__dict__.keys() + dir(Device))
         return list(sorted(all_attrs))
+
+    def update_status(self):
+        """Update Status.
+        """
+        self.update_status_proc = 1
 
     def check_limits(self):
         """ check motor limits:
@@ -347,7 +358,7 @@ class IMS(device.Device):
 
     def move(self, val=None, relative=False, wait=False, timeout=300.0,
              dial=False, step=False, raw=False,
-             ignore_limits=False, confirm_move=False):
+             ignore_limits=False, confirm_move=False, quiet=False):
         """ moves motor drive to position
 
         arguments:
@@ -401,6 +412,11 @@ class IMS(device.Device):
         if relative:
             val += self.get(drv)
 
+        # If within target tolerance do not try to move.
+        if not dial and not step:
+            if abs(val-self.get('RBV')) <= self.get('RDBD'):
+                return DONE_OK
+
         # Check for limit violations
         if not ignore_limits and not step:
             if not self.within_limits(val, dial=dial):
@@ -410,7 +426,9 @@ class IMS(device.Device):
         if stat is None:
             return UNCONNECTED
 
-        print self.name, stat, self.moving
+#        if not quiet:
+#            print self.name, stat, self.moving
+        
         if wait:
             if stat == -1: # move started, exceeded timeout
                 if self.get('DMOV') == 0:
@@ -599,12 +617,12 @@ class IMS(device.Device):
     def StopNow(self):
         """Stop motor as soon as possible.
         """
-        self.stop()
+        self.put('ESTP', 1)
 
     def stop(self):
         """Stop motor as soon as possible.
         """
-        self.STOP = 1
+        self.put('STOP', 1)
             
 #    def make_step_list(self, minstep=0.0, maxstep=None, decades=10):
 #        """ create a reasonable list of motor steps, as for a dropdown menu
@@ -638,6 +656,24 @@ class IMS(device.Device):
         """
         self.show_attrs()
 
+#    def show_records(self):
+#        """Show all additional records associated with the IMS motor.
+#        """
+#        out = []
+#        add = out.append
+#        attrs = [attr for attr in self._records
+#                 if attr[:4] != 'COPY' and attr != 'CFG_FILE']
+#        attrs.sort()
+#
+#        for attr in attrs:
+#            record = self._records[attr]
+#            rec = self.records.get_record(record)
+#            value = rec.get('VAL', as_string=True)
+#            desc = rec.DESC
+#            add('{:32} {:22} {:30}'.format(attr, value, desc))
+#
+#        epics.ca.write("\n".join(out))
+    
     def show_attrs(self, *args):
         """Show pv attributes.
         """

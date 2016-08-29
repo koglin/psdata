@@ -1,0 +1,244 @@
+Device Section	Device Acryn	Device No.	Signal Name	PV Names	PLC IO Block	PLC Channel Input	PLC Channel Out	 I/O Block Common	Signal Common	DIN Rail Slot	Relay Slot	Relay Input	Relay Output	Trunk	Trunk Pin No.	Destination DRL	Field Device Connection	Connector	Pin No.	PLC Channel Row Number				
+INPUTS																								
+			+24VDC	+24VDC					+24VDC					PLC 59A	1	R59-DRL-24	GCT-18A [CC]	Accessory	9					
+DG3	GCC	01	SP1	CXI:DG3:GCC:01:SP1_DI	Input 5	A0								PLC 59A	2	R59-DRL-24	GCT-18A [CC]	Accessory	2	4	OLD CONFIGURATION			
+			+24VDC	+24VDC					+24VDC					PLC 59A	3	R59-DRL-24	GCT-18A [A1]	Accessory	11		DG3	GPI	1	+24VDC
+DS1	GPI	02	SP1	CXI:DS1:GPI:02:SP1_DI	Input 5	A1								PLC 59A	4	R59-DRL-24	GCT-18A [A1]	Accessory	10	6	DG3	GPI	1	SP1
+			+24VDC	+24VDC					+24VDC					PLC 59A	5	R59-DRL-24	GCT-18A [A2]	Accessory	5					
+DG3	GPI	02	SP1	CXI:DG3:GPI:02:SP1_DI	Input 5	A2								PLC 59A	6	R59-DRL-24	GCT-18A [A2]	Accessory	12	8				
+			+24VDC	+24VDC					+24VDC					PLC 59A	7	R59-DRL-24	GCT-18A [B1]	Accessory	14		DS1	GPI	2	+24VDC
+DG3	GPI	01	SP1	CXI:DG3:GPI:01:SP1_DI	Input 5	A3								PLC 59A	8	R59-DRL-24	GCT-18A [B1]	Accessory	13	10	DS1	GPI	2	SP1
+					Input 5			CI	GND															
+									+24VDC															
+					Input 5	A4														13				
+			+24VDC	+24VDC					+24VDC					PLC 59B	25	R59-DRL-24	GCT-18B [CC]	Accessory	9					
+DG4	GCC	01	SP1	CXI:DG4:GCC:01:SP1_DI	Input 5	A5								PLC 59B	26	R59-DRL-24	GCT-18B [CC]	Accessory	2	15	OLD CONFIGURATION			
+			+24VDC	+24VDC					+24VDC					PLC 59B	27	R59-DRL-24	GCT-18B [A1]	Accessory	11		DG4	GPI	1	+24VDC
+SC1	GPI	04	SP1	CXI:SC1:GPI:04:SP1_DI	Input 5	A6								PLC 59B	28	R59-DRL-24	GCT-18B [A1]	Accessory	10	17	DG4	GPI	1	SP1
+			+24VDC	+24VDC					+24VDC					PLC 59B	29	R59-DRL-24	GCT-18B [A2]	Accessory	5					
+DG4	GPI	02	SP1	CXI:DG4:GPI:02:SP1_DI	Input 5	A7								PLC 59B	30	R59-DRL-24	GCT-18B [A2]	Accessory	12	19				
+					Input 5			CI	GND												NEW GAUGE GOES			
+			+24VDC	+24VDC					+24VDC					PLC 59B	31	R59-DRL-24	GCT-18B [B1]	Accessory	14		INTO THE PLACE OF DG4:GPI:01			
+DG4	GPI	01	SP1	CXI:DG4:GPI:01:SP1_DI	Input 5	B0								PLC 59B	32	R59-DRL-24	GCT-18B [B1]	Accessory	13	22				
+			+24VDC	+24VDC					+24VDC					PLC 59B	33	R59-DRL-24	GCT-18B [B2]	Accessory	15					
+SC1	GPI	03	SP1	CXI:SC1:GPI:03:SP1_DI	Input 5	B1								PLC 59B	34	R59-DRL-24	GCT-18B [B2]	Accessory	7	24				
+			GND	GND					GND					PLC 59C	1	R59-DRL-21	Onboard	J5	15 [GND]					
+DG3	PTM	01	SP1	CXI:DG3:PTM:01:SP1_DI	Input 5	B2								PLC 59C	2	R59-DRL-21	Onboard	J5	11	26				
+														PLC 59C	3	R59-DRL-21								
+DG3	PTM	01	FLT	CXI:DG3:PTM:01:FLT_DI	Input 5	B3								PLC 59C	4	R59-DRL-21	Onboard	J5	13	28				
+					Input 5			CII	GND															
+			+24VDC	+24VDC					+24VDC					PLC 59B	43	R59-DRL-24								
+DG4	VGC	01	OPN	CXI:DG4:VGC:01:OPN_DI	Input 5	B4								PLC 59B	44	R59-DRL-24				31				
+			+24VDC	+24VDC					+24VDC					PLC 59B	45	R59-DRL-24								
+DG4	VGC	01	CLS	CXI:DG4:VGC:01:CLS_DI	Input 5	B5								PLC 59B	46	R59-DRL-24				33				
+									+24VDC															
+					Input 5	B6														35				
+			GND	GND					GND					PLC 59D	25	R59-DRL-21	Onboard	J5	15 [GND]					
+DG4	PTM	01	SP1	CXI:DG4:PTM:01:SP1_DI	Input 5	B7								PLC 59D	26	R59-DRL-21	Onboard	J5	11	37				
+								CII	GND															
+														PLC 59D	27	R59-DRL-21								
+DG4	PTM	01	FLT	CXI:DG4:PTM:01:FLT_DI	Input 5	C0								PLC 59D	28	R59-DRL-21	Onboard	J5	13	40				
+			+24VDC	+24VDC					+24VDC					PLC 59E	1	R59-DRL-21					Upstream Vacuum Ok signal to Hutch 4			
+HFX	VAC	00	OK	CXI:HFX:VAC:00:OK_DI	Input 5	C1								PLC 59E	2	R59-DRL-21				42				
+			+24VDC	+24VDC					+24VDC					PLC 59D	39	R59-DRL-21	GCT-??[CC]							
+SC3	GCC	01	SP1	CXI:SC3:GCC:01:SP1_DI	Input 5	C2								PLC 59D	40	R59-DRL-21	GCT-??[CC]			44				
+									+24VDC					PLC 59D	41	R59-DRL-21	GCT-??[A1]							
+					Input 5	C3								PLC 59D	42	R59-DRL-21	GCT-??[A1]			46				
+					Input 5			CIII	GND															
+									+24VDC					PLC 59D	43	R59-DRL-21	GCT-??[A2]							
+					Input 5	C4								PLC 59D	44	R59-DRL-21	GCT-??[A2]			49				
+			+24VDC	+24VDC					+24VDC					PLC 59D	45	R59-DRL-21	GCT-??[B1]							
+SC3	GPI	01	SP1	CXI:SC3:GPI:01:SP1_DI	Input 5	C5								PLC 59D	46	R59-DRL-21	GCT-??[B1]			51				
+			+24VDC	+24VDC					+24VDC					PLC 59D	47	R59-DRL-21	GCT-??[B2]							
+SC3	GPI	02	SP1	CXI:SC3:GPI:02:SP1_DI	Input 5	C6								PLC 59D	48	R59-DRL-21	GCT-??[B2]			53				
+									+24VDC															
+					Input 5	C7														55				
+					Input 5			CIII	GND															
+									+24VDC															
+					Input 5	D0														58				
+									+24VDC															
+					Input 5	D1														60				
+									+24VDC															
+					Input 5	D2														62				
+									+24VDC															
+					Input 5	D3														64				
+					Input 5			CIV	GND															
+									+24VDC															
+					Input 5	D4														67				
+									+24VDC															
+					Input 5	D5														69				
+									+24VDC															
+					Input 5	D6														71				
+									+24VDC															
+					Input 5	D7														73				
+					Input 5			CIV	GND															
+																								
+OUTPUTS																								
+DG3	GCC	01	ENBL	CXI:DG3:GCC:01:ENBL_DO	Output 5		A0			2	12	+A1								77				
+									GND	2	12	-A2												
+DG3	GCC	01	ENBL		Output 5					2	12		11	PLC 59A	11	R59-DRL-24	GCT-18A [CC]							
+										2	12		14	PLC 59A	12	R59-DRL-24	GCT-18A [CC]							
+																								
+DG4	GCC	01	ENBL	CXI:DG4:GCC:01:ENBL_DO	Output 5		A1			2	13	+A1								82				
+									GND	2	13	-A2												
+DG4	GCC	01	ENBL		Output 5					2	13		11	PLC 59B	35	R59-DRL-24	GCT-18B [CC]							
+										2	13		14	PLC 59B	36	R59-DRL-24	GCT-18B [CC]							
+																								
+DG3	VCC	01	OPN	CXI:DG3:VCC:01:OPN_DO	Output 5		A2			2	14	+A1								87				
+									GND	2	14	-A2												
+									+24VDC	2	14		11											
+DG3	VCC	01	OPN		Output 5					2	14		14	PLC 59A	13	R59-DRL-24								
+									GND					PLC 59A	14	R59-DRL-24								
+DG3	VCC	02	OPN	CXI:DG3:VCC:02:OPN_DO	Output 5		A3			2	15	+A1								92				
+									GND	2	15	-A2												
+									+24VDC	2	15		11											
+DG3	VCC	02	OPN		Output 5					2	15		14	PLC 59A	15	R59-DRL-24								
+									GND					PLC 59A	16	R59-DRL-24								
+DG3	VIC	01	OPN	CXI:DG3:VIC:01:OPN_DO	Output 5		A4			2	16	+A1								97				
+									GND	2	16	-A2												
+									+24VDC	2	16		11											
+DG3	VIC	01	OPN		Output 5					2	16		14	PLC 59A	17	R59-DRL-24								
+									GND					PLC 59A	18	R59-DRL-24								
+DG4	VCC	01	OPN	CXI:DG4:VCC:01:OPN_DO	Output 5		A5			2	17	+A1								102				
+									GND	2	17	-A2												
+									+24VDC	2	17		11											
+DG4	VCC	01	OPN							2	17		14	PLC 59B	37	R59-DRL-24								
+									GND					PLC 59B	38	R59-DRL-24								
+DG4	VCC	02	OPN	CXI:DG4:VCC:02:OPN_DO	Output 5		A6			2	18	+A1								107				
+									GND	2	18	-A2												
+									+24VDC	2	18		11											
+DG4	VCC	02	OPN							2	18		14	PLC 59B	39	R59-DRL-24								
+									GND					PLC 59B	40	R59-DRL-24								
+DG4	VIC	01	OPN	CXI:DG4:VIC:01:OPN_DO	Output 5		A7			2	19	+A1								112				
+									GND	2	19	-A2												
+									+24VDC	2	19		11											
+DG4	VIC	01	OPN							2	19		14	PLC 59B	41	R59-DRL-24								
+									GND					PLC 59B	42	R59-DRL-24								
+					Output 5			CI	GND															
+					Output 5			VI	+24VDC															
+DG3	PTM	01	RUN	CXI:DG3:PTM:01:RUN_DO	Output 5		B0			2	20	+A1								119				
+									GND	2	20	-A2												
+DG3	PTM	01	RUN							2	20		11	PLC 59C	10	R59-DRL-21	Onboard	J5	9					
+DG3	PTM	01	RUN							2	20		14	PLC 59C	11	R59-DRL-21	Onboard	J5	1					
+									GND					PLC 59C	12	R59-DRL-21	Onboard	J5	2					
+DG3	PTM	01	ILK	CXI:DG3:PTM:01:ILK_DO	Output 5		B1			2	21	+A1								124				
+									GND	2	21	-A2												
+										2	21		11											
+DG3	PTM	01	ILK							2	21		14	PLC 59C	13	R59-DRL-21	Onboard	J5	3					
+									GND					PLC 59C	14	R59-DRL-21	Onboard	J5	4					
+DG4	PTM	01	RUN	CXI:DG4:PTM:01:RUN_DO	Output 5		B2			2	22	+A1								129				
+									GND	2	22	-A2												
+DG4	PTM	01	RUN							2	22		11	PLC 59D	34	R59-DRL-21	Onboard	J5	9					
+DG4	PTM	01	RUN							2	22		14	PLC 59D	35	R59-DRL-21	Onboard	J5	1					
+									GND					PLC 59D	36	R59-DRL-21	Onboard	J5	2					
+DG4	PTM	01	ILK	CXI:DG4:PTM:01:ILK_DO	Output 5		B3			2	23	+A1								134				
+									GND	2	23	-A2												
+										2	23		11											
+DG4	PTM	01	ILK							2	23		14	PLC 59D	37	R59-DRL-21	Onboard	J5	3					
+									GND					PLC 59D	38	R59-DRL-21	Onboard	J5	4					
+DG4	VGC	01	OPN	CXI:DG4:VGC:01:OPN_DO	Output 5		B4			2	24	+A1								139				
+									GND	2	24	-A2												
+									+24VDC	2	24		11											
+DG4	VGC	01	OPN							2	24		14	PLC 59B	47	R59-DRL-24								
+									GND					PLC 59B	48	R59-DRL-24								
+SC3	GCC	01	ENBL	CXI:SC3:GCC:01:ENBL_DO	Output 5		B5			2	56	+A1								144				
+									GND	2	56	-A2												
+SC3	GCC	01	ENBL						+24VDC	2	56		11	PLC 59D	32	R59-DRL-21								
+										2	56		14	PLC 59D	33	R59-DRL-21								
+									GND															
+SC3	VIC	01	OPN	CXI:SC3:VIC:01:OPN_DO	Output 5		B6			2	57	+A1								149				
+									GND	2	57	-A2												
+									+24VDC	2	57		11											
+SC3	VIC	01	OPN							2	57		14	PLC 59C	23	R59-DRL-24								
+									GND					PLC 59C	24	R59-DRL-24								
+					Output 5		B7					+A1								154				
+									GND			-A2												
+									+24VDC				11											
+													14											
+									GND															
+					Output 5			CII	GND															
+					Output 5			VII	+24VDC															
+SC3	PTM	01	RUN	CXI:SC3:PTM:01:RUN_DO	Output 5		C0			2	58	+A1								161				
+									GND	2	58	-A2												
+SC3	PTM	01	RUN						+24VDC	2	58		11	PLC 59C	22	R59-DRL-24								
+										2	58		14	PLC 59C	20	R59-DRL-24								
+									GND															
+SC3	PTM	01	ILK	CXI:SC3:PTM:01:ILK_DO	Output 5		C1			2	59	+A1								166				
+									GND	2	59	-A2												
+SC3	PTM	01	ILK						+24VDC	2	59		11	PLC 59C	22	R59-DRL-24								
+										2	59		14	PLC 59C	21	R59-DRL-24								
+									GND															
+					Output 5		C2					+A1								171				
+									GND			-A2												
+									+24VDC				11											
+													14											
+									GND															
+					Output 5		C3					+A1								176				
+									GND			-A2												
+													11											
+													14											
+									GND															
+					Output 5		C4					+A1								181				
+									GND			-A2												
+													11											
+													14											
+																								
+					Output 5		C5					+A1								186				
+									GND			-A2												
+													11											
+													14											
+																								
+					Output 5		C6					+A1								191				
+									GND			-A2												
+													11											
+													14											
+																								
+					Output 5		C7					+A1								196				
+									GND			-A2												
+													11											
+													14											
+																								
+								CIII	GND															
+								VIII	+24VDC															
+					Output 5		D0					+A1								203				
+									GND			-A2												
+													11											
+													14											
+																								
+					Output 5		D1					+A1								208				
+									GND			-A2												
+													11											
+													14											
+																								
+					Output 5		D2					+A1								213				
+									GND			-A2												
+													11											
+													14											
+																								
+					Output 5		D3					+A1								218				
+									GND			-A2												
+													11											
+													14											
+																								
+					Output 5		D4					+A1								223				
+									GND			-A2												
+													11											
+													14											
+																								
+					Output 5		D5					+A1								228				
+									GND			-A2												
+													11											
+													14											
+																								
+					Output 5		D6					+A1								233				
+									GND			-A2												
+													11											
+													14											
+																								
+					Output 5		D7					+A1								238				
+									GND			-A2												
+													11											
+													14											
+																								
+					Output 5			CIV	GND															
+					Output 5			VIV	+24VDC															

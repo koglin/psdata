@@ -1,0 +1,56 @@
+		FRONT		RACK B999-R51				BACK			
+											
+82.25					47	82.25	TGH-47			SLAC ###	47
+80.50					46	80.50	PPL-46			PPL TO R58	46
+78.75	DAQ-45			SuperMicro	45	78.75					45
+77.00	IOC-44 - ioc-cxi-cam7			SuperMicro	44	77.00					44
+75.25	DAQ-43			SuperMicro	43	75.25					43
+73.50	ioc-cxi-cam1				42	73.50					42
+71.75	IOC-41			Supermicro	41	71.75					41
+70.00					40	70.00	PWR-40			Leviton	40
+68.25	IOC-39 IOC-CXI-VAC1			SuperMicro	39	68.25					39
+66.50	TGH-38			SLAC ###	38	66.50					38
+64.75	IOC-37 IOC-CXI-MOT1			SuperMicro	37	64.75					37
+63.00	TGH-36			SLAC ###	36	63.00					36
+61.25	FAN-35			FAN TRAY	35	61.25					35
+59.50	BNK-34				34	59.50					34
+57.75	IOC-33  ioc-cxi-usr1  			SuperMicro	33	57.75					33
+56.00					32	56.00	PWR-32			Leviton	32
+54.25	IOC-31 ioc-cxi-misc1 			SuperMicro	31	54.25					31
+52.50	HCC-27	(TBD)			30	52.50					30
+50.75	Heater controller				29	50.75					29
+49.00					28	49.00					28
+47.25				Eurotherm	27	47.25	DRL-24				27
+45.50					26	45.50	camera, IMB, FLP, LED,Beckhoff				26
+43.75					25	43.75					25
+42.00					24	42.00				Phx Con	24
+40.25					23	40.25	DRL-20				23
+38.50	MCP-20				22	38.50	+5 TTL, RTDs, Beckhoff, KL2124,				22
+36.75	PIEZO motor controller				21	36.75	KL3202				21
+35.00					20	35.00				Phx Con	20
+33.25	SER-19			Digi TS16MEI	19	33.25					19
+31.50	PSM-16				18	31.50					18
+29.75					17	29.75					17
+28.00				SLAC SD-261-200	16	28.00					16
+26.25					15	26.25	PWR-15			Leviton	15
+24.50	MCC-13				14	24.50					14
+22.75	(Mforce 4x 8)			SLAC SD-261-201	13	22.75					13
+21.00	PSM-10				12	21.00					12
+19.25					11	19.25					11
+17.50				SLAC SD-261-200	10	17.50					10
+15.75	FAN-09			FAN TRAY	09	15.75					09
+14.00	BNK-08				08	14.00					08
+12.25	PCI-05				07	12.25					07
+10.50					06	10.50					06
+08.75				Gamma Vacuum MPC	05	08.75					05
+07.00	BNK-04				04	07.00					04
+05.25	PCI-01				03	05.25					03
+03.50					02	03.50					02
+01.75				Gamma Vacuum MPC	01	01.75					01
+											
+			STANFORD LINEAR ACCELERATOR CENTER			LINAC COHERENT LIGHT SOURCE					
+			US DEPARTMENT OF ENERGY			INSTRUMENTATION & CONTROL RACKS					
+			STANFORD UNIVERSITY, STANFORD, CA			RACK B999-R51					
+ENGR		CHECKED		DATE		PRELIMINARY				A	
+DESIGNER/COORD				11/24/2014							
+						Revision 2					

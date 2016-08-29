@@ -1,0 +1,10 @@
+{% if hutch_list%}
+    <ul>
+    {% for hutch in hutch_list %}
+    <li><a href="{% url 'racks:Hutch_View' hutch.id%}"> {{hutch.name }}</a></li>
+    {% endfor %}
+    </ul>
+
+{% else %}
+    <p>Rack information not available at this time</p>
+{% endif %}

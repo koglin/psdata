@@ -1,19 +1,11 @@
 import psdata
 import os
+import time
 from glob import glob
 from PSCalib.GeometryAccess import *
 from PSCalib.SegGeometryCspad2x1V1 import cspad2x1_one as sg
 
 from pylab import *
-
-#import numpy as np
-#import matplotlib.pyplot as plt
-#from matplotlib.widgets import Button, Slider
-#import matplotlib.patches as plt_patches
-
-# https://pswww.slac.stanford.edu/swdoc/releases/ana-current/pyana-ref/html/PSCalib/#module-PSCalib.SegGeometryCspad2x1V1
-
-quad_colors = ['k', 'g', 'purple', 'b']
 
 class cspad2x2(psdata.Detector):
     """cspad2x2 Detector Class of psdata.Detector.
@@ -33,13 +25,150 @@ class cspad2x2(psdata.Detector):
     def __init__(self,*args,**kwargs):
 
         psdata.Detector.__init__(self,*args,**kwargs)
+        
+        parameters = {
+                'pedestal': 0.,
+                'roi': None,
+                }
+        self.set_parameter(**parameters)
+
+    def setup_hits(self):
+        self.set_parameter(_hitfinder=self.detector.raw*0)
+        self.add_event_function('add_hits')
+        self.add_event_function('show_info',nevents=100)
+
+    def add_hits(self, threshold=25):
+        self._hitfinder += self.detector.calib > threshold
+
+
+    @property
+    def data_ami(self):
+        """Transform ami data into same shape as psana data.
+        """
+        data1 = np.array(self.ami.data[0][2])
+        data2 = np.array(self.ami.data[1][2])
+        data = np.array([data1, data2])/self.ami.entries/10.
+        return data.T
+
+    @property
+    def data_array(self):
+        """Put 2x2 Cspad data into data_array.
+           If no psana data, use ami data.
+        """
+        if self._data._no_evtData:
+            return self.data_ami - self.pedestal
+        else:
+            return self.data - self.pedestal
+
+    @property
+    def hist(self):
+        y, x = histogram(self.detector.calib, bins=arange(-25,75,1))
+        self.xhist = x
+        return y
+
+    @property
+    def hit_image(self):
+        """Raw image from detector make_image function.
+        """
+        return self.detector.make_image(self._hitfinder)
+
+    @property
+    def raw_image(self):
+        """Raw image from detector make_image function.
+        """
+        return self.detector.make_image(self.detector.raw)
+
+    @property
+    def image(self):
+        """Create image from data_array.
+        """
+        return self.detector.image
+#        return self.data_array.reshape(370,388)
+#           return img_from_pixel_arrays(self.iX,self.iY,W=self.data_array)
+
+    def publish(self, name=None, title=None, 
+                start=True, stop=False, **kwargs):
+        """Publish plot with psmon.
+           Plot can be read on multiple machines with psplot.
+        """
+        if not name:
+            name = self._name
+        if not title:
+            title = self._desc
+        if not title:
+            title = self._name
+
+        if start:
+            self.add_psplot('image', plot_type='Image', 
+                            name=name, title=title, local=True)
+        
+        if stop:
+            self.del_psplot(name)
+
+    def make_pedestal(self,nevents=1000):
+        """Make a pedestal.
+           Use ami data if no psana data present.
+        """
+        if self._data._no_evtData:
+            self.ami.ami_clear()
+            time.sleep(nevents/120.)
+            self.set_parameter(pedestal=self.data_ami)
+
+        else:
+            pedestal = self.data*0.
+            print 'Recording Pedestal for {:} with {:} Events'.format(self.desc, nevents)
+            ievent = 0
+            iempty = 0
+            while ievent < nevents:
+                self._data.next_event()
+                if self.data is not None:
+                    pedestal += self.data
+                    ievent += 1
+                    if ievent % 100 == 0:
+                        print '{:6.1f}% Complete'.format(ievent*100./float(nevents))
+                else:
+                    iempty += 1
+                    if iempty % 100 == 0:
+                        print '{:} out of {:} events empty'.format(iempty,ievent)
+
+            pedestal /= float(nevents)
+            self.set_parameter(pedestal=pedestal)
+
+    def new_plot(self):
+        plt.ion()
+        plt.imshow(self.image)
+        plt.clim(vmin=self.vmin,vmax=self.vmax)
+        plt.colorbar()
+
+    def plot(self, nevents=1, monitor=False, next_event=False):
+        """Plot CSpad image.
+        """
+        ievent = 0
+        try:
+            plt.ion()
+            plt.show()
+            while ievent < nevents or monitor:
+                if ievent > 0 or next_event or monitor:
+                    self._data.next_event()
+                plt.imshow(self.image)
+                plt.draw()
+                ievent += 1
+        except KeyboardInterrupt:
+            pass
+
+#import numpy as np
+#import matplotlib.pyplot as plt
+#from matplotlib.widgets import Button, Slider
+#import matplotlib.patches as plt_patches
+
+# https://pswww.slac.stanford.edu/swdoc/releases/ana-current/pyana-ref/html/PSCalib/#module-PSCalib.SegGeometryCspad2x1V1
+
+
 #        self.load_geometry(**kwargs)
 #        self.load_pixel_coord_indexes(**kwargs)
 
-        self.sg = sg
-        self.pedestal = 0.
-        self.vmin = -10
-        self.vmax = 10
+#        self.sg = sg
+
 #        sg.print_seg_info(0377)
 
 ##        size_arr = sg.size()
@@ -101,61 +230,5 @@ class cspad2x2(psdata.Detector):
 
 # global method for rotation of numpy arrays:
 #Xrot, Yrot = rotation(X, Y, C, S)
-
-    @property
-    def data_array(self):
-        """Put 2x2 Cspad data into data_array .
-        """
-        return self.data - self.pedestal
-
-    @property
-    def image(self):
-        """Create image from data_array.
-        """
-        return self.data_array.reshape(370,388)
-#        return img_from_pixel_arrays(self.iX,self.iY,W=self.data_array)
-
-    def make_pedestal(self,nevents=1000):
-        self.pedestal = self.data*0.
-        print 'Recording Pedestal for {:} with {:} Events'.format(self.desc, nevents)
-        ievent = 0
-        iempty = 0
-        while ievent < nevents:
-            self._data.next_event()
-            if self.data is not None:
-                self.pedestal += self.data
-                ievent += 1
-                if ievent % 100 == 0:
-                    print '{:6.1f}% Complete'.format(ievent*100./float(nevents))
-            else:
-                iempty += 1
-                if iempty % 100 == 0:
-                    print '{:} out of {:} events empty'.format(iempty,ievent)
-
-        self.pedestal /= float(nevents)
-
-    def new_plot(self):
-        plt.ion()
-        plt.imshow(self.image)
-        plt.clim(vmin=self.vmin,vmax=self.vmax)
-        plt.colorbar()
-
-    def plot(self, nevents=1, monitor=False, next_event=False):
-        """Plot CSpad image.
-        """
-        ievent = 0
-        try:
-            plt.ion()
-            plt.show()
-            while ievent < nevents or monitor:
-                if ievent > 0 or next_event or monitor:
-                    self._data.next_event()
-                plt.imshow(self.image)
-                plt.draw()
-                ievent += 1
-        except KeyboardInterrupt:
-            pass
-
-
 
 

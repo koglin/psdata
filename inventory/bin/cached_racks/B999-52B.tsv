@@ -1,0 +1,56 @@
+		FRONT				RACK B999-52B				BACK				
+														
+	82.25					47			82.25					47
+	80.50					46			80.50	PPL-46 to Rk 58			HT Gigaband	46
+	78.75	PPL-45	1U FODU -- FC/APC			45			78.75					45
+	77.00					44			77.00					44
+	75.25	PPL-43 		RF FANOUT		43			75.25					43
+	73.50	SYN-42		RF resync		42			73.50					42
+	71.75					41			71.75	AC/DC P.S. 				41
+	70.00	TIC-39				40			70.00		TIMING CHASSIS			40
+	68.25		Time Interval Counter			39			68.25					39
+	66.50					38			66.50					38
+	64.75	SIM-35				37			64.75	DRL-36				37
+	63.00					36			63.00	+12VDC Camera Power				36
+	61.25				SIM900	35			61.25					35
+	59.50					34			59.50	DIN-33				34
+	57.75	VME-31				33			57.75	Analog Breakout Rail				33
+	56.00	AVME9670, IP330A, 				32			56.00					32
+	54.25	IP231,PMC230			4-Slot	31			54.25					31
+	52.50	SER-30			Digi TS16MEI	30			52.50	PWR-30			Leviton	30
+	50.75	Agilent 53210A				29			50.75					29
+	49.00	RF Counter				28			49.00					28
+	47.25					27			47.25					27
+	45.50	LBNL Timing Chassis				26			45.50					26
+	43.75					25			43.75					25
+	42.00				4-Slot	24			42.00					24
+	40.25					23			40.25	Rail				23
+	38.50	IOC-22			Atom SuperMicro	22			38.50					22
+	36.75	IOC-21			Atom SuperMicro	21			36.75					21
+	35.00					20			35.00					20
+	33.25					19			33.25					19
+	31.50	Rigol Digital Oscilloscope				18			31.50					18
+	29.75	DS1204B				17			29.75					17
+	28.00					16			28.00					16
+	26.25	SER-15			Digi TS16MEI	15			26.25	PWR-15			Leviton	15
+	24.50					14			24.50					14
+	22.75	LSC-12				13			22.75	DRL-10	Bechoff Din Rail			13
+	21.00	XES laser shutter controller 01				12			21.00	Dig Out and Dig In - TTL 5V				12
+	19.25	LSC-10				11			19.25					11
+	17.50	XES laser shutter controller 02				10			17.50					10
+	15.75	LSC-08				09			15.75					09
+	14.00	XES laser shutter controller 03				08			14.00					08
+	12.25	BNK-07				07			12.25					07
+	10.50	BNK-06				06			10.50					06
+	08.75	FAN-05			FAN TRAY	05			08.75					05
+	07.00	Heat Exchanger				04			07.00	Heat Exchanger				04
+	05.25					03			05.25					03
+	03.50					02			03.50					02
+	01.75					01			01.75					01
+														
+STANFORD LINEAR ACCELERATOR CENTER								LINAC COHERENT LIGHT SOURCE						
+US DEPARTMENT OF ENERGY								INSTRUMENTATION & CONTROL RACKS						
+STANFORD UNIVERSITY, STANFORD, CA								RACK B999-52B						
+ENGR			CHECKED		DATE			PRELIMINARY						A
+paco			LAST MODIFIED		11/24/14									
+DESIGNER/COORD								Revision 4						

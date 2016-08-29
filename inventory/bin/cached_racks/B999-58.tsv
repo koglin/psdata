@@ -1,0 +1,57 @@
+		FRONT		RACK B999-R58				BACK			
+											
+82.25					47	82.25					47
+80.50	FOD-45				46	80.50					46
+78.75				Systimax G2-600	45	78.75					45
+77.00	PPL-44  Fiber			HT Gigaband	44	77.00					44
+75.25	PPL-43  control room			HT Gigaband	43	75.25					43
+73.50					42	73.50					42
+71.75					41	71.75					41
+70.00					40	70.00					40
+68.25					39	68.25					39
+66.50	CPC-37				38	66.50					38
+64.75	(Timing Fanout)			ELMA cPCI 2RU	37	64.75					37
+63.00					36	63.00					36
+61.25					35	61.25					35
+59.50	ESW-34			ENET	34	59.50					34
+57.75	PPL-33 to Rk 59A			HT Gigaband	33	57.75					33
+56.00	TGH-32				32	56.00	PWR-32			Leviton	32
+54.25	PPL-31 to Rk 51			HT Gigaband	31	54.25					31
+52.50	TGH-30			SLAC ###	30	52.50					30
+50.75	PPL-29 to Rk 52			HT Gigaband	29	50.75					29
+49.00	TGH-28			SLAC ###	28	49.00					28
+47.25	PPL-27 to Rk 53			HT Gigaband	27	47.25					27
+45.50	TGH-26			SLAC ###	26	45.50					26
+43.75	PPL-25 to Rk 54			HT Gigaband	25	43.75					25
+42.00	TGH-24			SLAC ###	24	42.00	DRL-22				24
+40.25	PPL-23 to CXI CR			HT Gigaband	23	40.25	Inclinometer readout , +24DVC				23
+38.50	ESW-22			FDY NET GS648P	22	38.50				Phx Con	22
+36.75					21	36.75					21
+35.00	TGH-20			SLAC ###	20	35.00					20
+33.25	ESW-19			FDY NET GS648P	19	33.25					19
+31.50					18	31.50					18
+29.75	TGH-17			SLAC ###	17	29.75					17
+28.00	ESW-16			FDY NET GS648P	16	28.00					16
+26.25	PPL-15 to Rk56			HT Gigaband	15	26.25	PWR-15			Leviton	15
+24.50	TGH-14			SLAC ###	14	24.50					14
+22.75	PPL-13 to Rk57			HT Gigaband	13	22.75	PPL-13			BNC	13
+21.00	TGH-12			SLAC ###	12	21.00	PPL-12 (RG58 to CR-50)				12
+19.25	PPL-11 to Rk59			HT Gigaband	11	19.25	DRL-10 (24 Pr to CR-50)				11
+17.50	TGH-10			SLAC ###	10	17.50					10
+15.75	PPL-09 to R52A			HT Gigaband	09	15.75					09
+14.00	TGH-08			SLAC ###	08	14.00					08
+12.25	PPL-07 to R52B			HT Gigaband	07	12.25					07
+10.50					06	10.50					06
+08.75					05	08.75					05
+07.00					04	07.00					04
+05.25					03	05.25					03
+03.50					02	03.50					02
+01.75					01	01.75					01
+											
+			STANFORD LINEAR ACCELERATOR CENTER			LINAC COHERENT LIGHT SOURCE					
+			US DEPARTMENT OF ENERGY			INSTRUMENTATION & CONTROL RACKS					
+			STANFORD UNIVERSITY, STANFORD, CA			RACK B999-R58					
+ENGR		CHECKED		DATE		PRELIMINARY				A	
+DESIGNER/COORD											
+				10/13/2010		Revision 2					
+F. PRADO				4/4/2014							

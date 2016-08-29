@@ -1,57 +1,62 @@
-"""Acqiris Functions.
-"""
+import psdata
+import os
 
-def _init(self):
-    """Initialize function called when this file is loaded using
-       the psdata Detector class load_functions call.  
-       All other functions are loaded in the _user_functions 
-       dictionary and called dynaically.
-       e.g.,
-          data.acqiris.load_functions('acqiris') 
-    """
-    for ch in range(self.data_shape[0]):
-        name = 'Ch'+str(ch+1) 
-        self.add_function(Channel(self,ch,name),name)
+from pylab import *
 
-def nchannels(self):
-    """Number of Acqiris channels.
+class Acqiris(psdata.Detector):
+    """Acqiris Functions.
     """
-    return self.data_shape[0] 
 
-def ch_sum(self):
-    """Dictionary of max value from waveforms for acqiris channels.
-       (no doc in show_info)
-    """
-    return [getattr(self,ch).waveform.sum() 
-            for ch in self._channel_dict]
+    def __init__(self,*args,**kwargs):
 
-def ch_max(self):
-    """Dictionary of max value from waveforms for acqiris channels.
-       (no doc in show_info)
-    """
-    return [getattr(self,ch).waveform.max() 
-            for ch in self._channel_dict]
+        psdata.Detector.__init__(self,*args,**kwargs)
+        
+        init_params = {'pedestal': 0, 'roi': None}
+        self.set_parameter(**init_params)
+ 
+        for ch in range(self.data_shape[0]):
+            name = 'Ch'+str(ch+1) 
+            self.add_function(Channel(self,ch,name),name)
 
-def ch_min(self):
-    """Dictionary of max value from waveforms for acqiris channels.
-       (no doc in show_info)
-    """
-    return [getattr(self,ch).waveform.min() 
-            for ch in self._channel_dict]
+    def nchannels(self):
+        """Number of Acqiris channels.
+        """
+        return self.data_shape[0] 
 
-def ch_std(self):
-    """Dictionary of max value from waveforms for acqiris channels.
-       (no doc in show_info)
-    """
-    return [int(getattr(self,ch).waveform.std()) 
-            for ch in self._channel_dict]
+    def ch_sum(self):
+        """Dictionary of max value from waveforms for acqiris channels.
+           (no doc in show_info)
+        """
+        return [getattr(self,ch).waveform.sum() 
+                for ch in self._channel_dict]
 
-def _channel_dict(self):
-    """Dictionary of acqiris psana data attribute index values 
-       for acqiris channels.
-       (no doc in show_info)
-    """
-    return {'Ch'+str(num+1):num for num in range(self.data_shape[0])}
+    def ch_max(self):
+        """Dictionary of max value from waveforms for acqiris channels.
+           (no doc in show_info)
+        """
+        return [getattr(self,ch).waveform.max() 
+                for ch in self._channel_dict]
+
+    def ch_min(self):
+        """Dictionary of max value from waveforms for acqiris channels.
+           (no doc in show_info)
+        """
+        return [getattr(self,ch).waveform.min() 
+                for ch in self._channel_dict]
+
+    def ch_std(self):
+        """Dictionary of max value from waveforms for acqiris channels.
+           (no doc in show_info)
+        """
+        return [int(getattr(self,ch).waveform.std()) 
+                for ch in self._channel_dict]
+
+    def _channel_dict(self):
+        """Dictionary of acqiris psana data attribute index values 
+           for acqiris channels.
+           (no doc in show_info)
+        """
+        return {'Ch'+str(num+1):num for num in range(self.data_shape[0])}
 
 
 class Channel(object):

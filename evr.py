@@ -11,21 +11,21 @@ class evr(psdata.Detector):
     @property
     def eventCodes(self):
         if hasattr(self,'fifoEvents'):
-            return [fifo.eventCode() for fifo in self.fifoEvents]
+            return [fifo.eventCode for fifo in self.fifoEvents]
         else:
             return []
 
     @property
     def timestampsHigh(self):
         if hasattr(self,'fifoEvents'):
-            return [fifo.timestampHigh() for fifo in self.fifoEvents]
+            return [fifo.timestampHigh for fifo in self.fifoEvents]
         else:
             return []
 
     @property
     def timestampsLow(self):
         if hasattr(self,'fifoEvents'):
-            return [fifo.timestampLow() for fifo in self.fifoEvents]
+            return [fifo.timestampLow for fifo in self.fifoEvents]
         else:
             return []
 

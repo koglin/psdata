@@ -1,0 +1,56 @@
+		FRONT		RACK B999-R52				BACK			
+											
+82.25	TGH-47			SLAC ###	47	82.25	TGH-47			SLAC ###	47
+80.50	DRL-45				46	80.50	PPL-46			PPL TO R58	46
+78.75	MPS				45	78.75					45
+77.00	DRL-39 				44	77.00					44
+75.25	Valve PLC 				43	75.25					43
+73.50					42	73.50					42
+71.75					41	71.75	Vacuum PLC (Beckhoff) VAC-R52-38R				41
+70.00					40	70.00					40
+68.25					39	68.25					39
+66.50	CXI Vacuum PLC I/O DIN rails				38	66.50	Direct 205 Logic				38
+64.75					37	64.75					37
+63.00					36	63.00					36
+61.25					35	61.25	DRL-35				35
+59.50					34	59.50					34
+57.75					33	57.75					33
+56.00					32	56.00	PWR-32			Leviton	32
+54.25					31	54.25					31
+52.50					30	52.50					30
+50.75					29	50.75					29
+49.00					28	49.00					28
+47.25					27	47.25					27
+45.50					26	45.50					26
+43.75					25	43.75					25
+42.00					24	42.00					24
+40.25					23	40.25					23
+38.50					22	38.50					22
+36.75					21	36.75					21
+35.00					20	35.00					20
+33.25					19	33.25					19
+31.50					18	31.50					18
+29.75					17	29.75					17
+28.00					16	28.00					16
+26.25					15	26.25					15
+24.50					14	24.50					14
+22.75	PSP-12				13	22.75					13
+21.00	PMC-100 pwr supply chassis				12	21.00					12
+19.25	SER-11			Digi TS16MEI	11	19.25					11
+17.50	BNK-10				10	17.50	PWR-10			Leviton	10
+15.75	EXC-09			FAN TRAY	09	15.75					09
+14.00	BNK-08				08	14.00					08
+12.25					07	12.25					07
+10.50					06	10.50					06
+08.75					05	08.75					05
+07.00					04	07.00					04
+05.25					03	05.25					03
+03.50					02	03.50					02
+01.75					01	01.75					01
+											
+			STANFORD LINEAR ACCELERATOR CENTER			LINAC COHERENT LIGHT SOURCE					
+			US DEPARTMENT OF ENERGY			INSTRUMENTATION & CONTROL RACKS					
+			STANFORD UNIVERSITY, STANFORD, CA			RACK B999-R52					
+ENGR		CHECKED		DATE		PRELIMINARY				A	
+DESIGNER/COORD				11/24/2014							
+						Revision 1					

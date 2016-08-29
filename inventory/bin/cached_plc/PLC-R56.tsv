@@ -1,0 +1,244 @@
+Device Section	Device Acryn	Device No.	Signal Name	PV Names	PLC IO Block	PLC Channel Input	PLC Channel Out	 I/O Block Common	Signal Common	DIN Rail Slot	Relay Slot	Relay Input	Relay Output	Trunk	Trunk Pin No.	Destination DRL	Field Device Connection	Connector	Pin No.	PLC Channel Row Number
+INPUTS																				
+			+24VDC	+24VDC					+24VDC					PLC 56A	7	R56-DRL-40				
+DG2	VGC	02	OPN	CXI:DG2:VGC:02:OPN_DI	Input 3	A0								PLC 56A	8	R56-DRL-40				4
+			+24VDC	+24VDC					+24VDC					PLC 56A	9	R56-DRL-40				
+DG2	VGC	02	CLS	CXI:DG2:VGC:02:CLS_DI	Input 3	A1								PLC 56A	10	R56-DRL-40				6
+			+24VDC	+24VDC					+24VDC					PLC 56A	1	R56-DRL-40				
+SC1	VGC	01	OPN	CXI:SC1:VGC:01:OPN_DI	Input 3	A2								PLC 56A	2	R56-DRL-40				8
+			+24VDC	+24VDC					+24VDC					PLC 56A	3	R56-DRL-40				
+SC1	VGC	01	CLS	CXI:SC1:VGC:01:CLS_DI	Input 3	A3								PLC 56A	4	R56-DRL-40				10
+					Input 3			CI	GND											
+			+24VDC	+24VDC					+24VDC					PLC 56A	13	R56-DRL-40				
+SC1	VGC	03	OPN	CXI:SC1:VGC:03:OPN_DI	Input 3	A4								PLC 56A	14	R56-DRL-40				13
+			+24VDC	+24VDC					+24VDC					PLC 56A	15	R56-DRL-40				
+SC1	VGC	03	CLS	CXI:SC1:VGC:03:CLS_DI	Input 3	A5								PLC 56A	16	R56-DRL-40				15
+			+24VDC	+24VDC					+24VDC					PLC 56A	19	R56-DRL-40				
+SC1	VGC	04	OPN	CXI:SC1:VGC:04:OPN_DI	Input 3	A6								PLC 56A	20	R56-DRL-40				17
+			+24VDC	+24VDC					+24VDC					PLC 56A	21	R56-DRL-40				
+SC1	VGC	04	CLS	CXI:SC1:VGC:04:CLS_DI	Input 3	A7								PLC 56A	22	R56-DRL-40				19
+					Input 3			CI	GND											
+			+24VDC	+24VDC					+24VDC					PLC 56B	25	R56-DRL-40	PCT-16A	X14	18	
+SC2	PTM	01	FLT	CXI:SC2:PTM:01:FLT_DI	Input 3	B0								PLC 56B	26	R56-DRL-40	PCT-16A	X14	1	22
+			+24VDC	+24VDC					+24VDC					PLC 56B	27	R56-DRL-40	PCT-16A	X14	19	
+SC2	PTM	01	NORMAL	CXI:SC2:PTM:01:NORMAL_DI	Input 3	B1								PLC 56B	28	R56-DRL-40	PCT-16A	X14	2	24
+			+24VDC	+24VDC					+24VDC					PLC 56B	29	R56-DRL-40	PCT-16A	X14	20	
+SC2	PTM	01	WARNING	CXI:SC2:PTM:01:WARNING_DI	Input 3	B2								PLC 56B	30	R56-DRL-40	PCT-16A	X14	3	26
+			+24VDC	+24VDC					+24VDC					PLC 56B	31	R56-DRL-40	PCT-16A	X14	21	
+SC2	PTM	01	ACCEL	CXI:SC2:PTM:01:ACCEL_DI	Input 3	B3								PLC 56B	32	R56-DRL-40	PCT-16A	X14	4	28
+					Input 3			CII	GND											
+			+24VDC	+24VDC					+24VDC					PLC 56B	33	R56-DRL-40	PCT-16A	X14	22	
+SC2	PTM	01	DECEL	CXI:SC2:PTM:01:DECEL_DI	Input 3	B4								PLC 56B	34	R56-DRL-40	PCT-16A	X14	5	31
+			+24VDC	+24VDC					+24VDC					PLC 56B	35	R56-DRL-40	PCT-16A	X14	23	
+SC2	PTM	01	OPT1	CXI:SC2:PTM:01:OPT1_DI	Input 3	B5								PLC 56B	36	R56-DRL-40	PCT-16A	X14	6	33
+			+24VDC	+24VDC					+24VDC					PLC 56B	37	R56-DRL-40	PCT-16A	X14	24	
+SC2	PTM	01	OPT2	CXI:SC2:PTM:01:OPT2_DI	Input 3	B6								PLC 56B	38	R56-DRL-40	PCT-16A	X14	7	35
+			GND	GND					GND					PLC 56D	25	R56-DRL-37	Onboard	J1	15 [GND]	
+DSU	PTM	01	SP1	CXI:DSU:PTM:01:SP1_DI	Input 3	B7								PLC 56D	26	R56-DRL-37	Onboard	J1	11	37
+					Input 3			CII	GND											
+			GND	GND					GND					PLC 56D	27	R56-DRL-37	Onboard	J1	15 [GND]	
+DSU	PTM	01	FLT	CXI:DSU:PTM:01:FLT_DI	Input 3	C0								PLC 56D	28	R56-DRL-37	Onboard	J1	13	40
+			GND	GND					+24VDC					PLC 56D	29	R56-DRL-37	Onboard	J1	15 [GND]	
+DSU	PTM	03	SP1	CXI:DSU:PTM:03:SP1_DI	Input 3	C1								PLC 56D	30	R56-DRL-37	Onboard	J1	11	42
+			GND	GND					+24VDC					PLC 56D	31	R56-DRL-37	Onboard	J1	15 [GND]	
+DSU	PTM	03	FLT	CXI:DSU:PTM:03:FLT_DI	Input 3	C2								PLC 56D	32	R56-DRL-37	Onboard	J1	13	44
+			+24VDC	+24VDC					+24VDC					PLC 56D	41	R56-DRL-37				
+DSU	VIC	03	OPN	CXI:DSU:VIC:03:OPN_DI	Input 3	C3								PLC 56D	42	R56-DRL-37				46
+					Input 3			CIII	GND											
+			+24VDC	+24VDC					+24VDC					PLC 56C	1	R56-DRL-37	PCT-16B	X14	18	
+SC1	PTM	01	FLT	CXI:SC1:PTM:01:FLT_DI	Input 3	C4								PLC 56C	2	R56-DRL-37	PCT-16B	X14	1	49
+			+24VDC	+24VDC					+24VDC					PLC 56C	3	R56-DRL-37	PCT-16B	X14	19	
+SC1	PTM	01	NORMAL	CXI:SC1:PTM:01:NORMAL_DI	Input 3	C5								PLC 56C	4	R56-DRL-37	PCT-16B	X14	2	51
+			+24VDC	+24VDC					+24VDC					PLC 56C	5	R56-DRL-37	PCT-16B	X14	20	
+SC1	PTM	01	WARNING	CXI:SC1:PTM:01:WARNING_DI	Input 3	C6								PLC 56C	6	R56-DRL-37	PCT-16B	X14	3	53
+			+24VDC	+24VDC					+24VDC					PLC 56C	7	R56-DRL-37	PCT-16B	X14	21	
+SC1	PTM	01	ACCEL	CXI:SC1:PTM:01:ACCEL_DI	Input 3	C7								PLC 56C	8	R56-DRL-37	PCT-16B	X14	4	55
+					Input 3			CIII	GND											
+			+24VDC	+24VDC					+24VDC					PLC 56C	9	R56-DRL-37	PCT-16B	X14	22	
+SC1	PTM	01	DECEL	CXI:SC1:PTM:01:DECEL_DI	Input 3	D0								PLC 56C	10	R56-DRL-37	PCT-16B	X14	5	58
+			+24VDC	+24VDC					+24VDC					PLC 56C	11	R56-DRL-37	PCT-16B	X14	23	
+SC1	PTM	01	OPT1	CXI:SC1:PTM:01:OPT1_DI	Input 3	D1								PLC 56C	12	R56-DRL-37	PCT-16B	X14	6	60
+			+24VDC	+24VDC					+24VDC					PLC 56C	13	R56-DRL-37	PCT-16B	X14	24	
+SC1	PTM	01	OPT2	CXI:SC1:PTM:01:OPT2_DI	Input 3	D2								PLC 56C	14	R56-DRL-37	PCT-16B	X14	7	62
+			+24VDC	+24VDC					+24VDC					PLC 56D	43	R56-DRL-37				
+DSU	VIC	03	CLS	CXI:DSU:VIC:03:CLS_DI	Input 3	D3								PLC 56D	44	R56-DRL-37				64
+					Input 3			CIV	GND											
+			+24VDC	+24VDC					+24VDC					PLC 56E	25	R56-DRL-36				
+SC1	PTM	03	SP1	CXI:SC1:PTM:03:SP1_DI	Input 3	D4								PLC 56E	26	R56-DRL-36				67
+			+24VDC	+24VDC					+24VDC					PLC 56E	27	R56-DRL-36				
+SC1	PTM	03	FLT	CXI:SC1:PTM:03:FLT_DI	Input 3	D5								PLC 56E	28	R56-DRL-36				69
+			+24VDC	+24VDC					+24VDC					PLC 56E	33	R56-DRL-36				
+					Input 3	D6								PLC 56E	34	R56-DRL-36				71
+			+24VDC	+24VDC					+24VDC					PLC 56E	35	R56-DRL-36				
+					Input 3	D7								PLC 56E	36	R56-DRL-36				73
+					Input 3			CIV	GND											
+																				
+OUTPUTS																				
+DG2	VGC	02	OPN	CXI:DG2:VGC:02:OPN_DO	Output 3		A0			2	27	+A1								77
+									GND	2	27	-A2								
+									+24VDC	2	27		11							
+DG2	VGC	02	OPN		Output 3					2	27		14	PLC 56A	11	R56-DRL-40				
+									GND					PLC 56A	12	R56-DRL-40				
+DSU	VCC	01	OPN	CXI:DSU:VCC:01:OPN_DO	Output 3		A1			2	28	+A1								82
+									GND	2	28	-A2								
+									+24VDC	2	28		11							
+DSU	VCC	01	OPN		Output 3					2	28		14	PLC 56E	1	R56-DRL-36				
+									GND					PLC 56E	2	R56-DRL-36				
+DSU	VCC	02	OPN	CXI:DSU:VCC:02:OPN_DO	Output 3		A2			2	29	+A1								87
+									GND	2	29	-A2								
+									+24VDC	2	29		11							
+DSU	VCC	02	OPN		Output 3					2	29		14	PLC 56E	3	R56-DRL-36				
+									GND					PLC 56E	4	R56-DRL-36				
+DSU	VIC	01	OPN	CXI:DSU:VIC:01:OPN_DO	Output 3		A3			2	30	+A1								92
+									GND	2	30	-A2								
+									+24VDC	2	30		11							
+DSU	VIC	01	OPN		Output 3					2	30		14	PLC 56E	5	R56-DRL-36				
+									GND					PLC 56E	6	R56-DRL-36				
+SC1	VGC	01	OPN	CXI:SC1:VGC:01:OPN_DO	Output 3		A4			2	31	+A1								97
+									GND	2	31	-A2								
+									+24VDC	2	31		11							
+SC1	VGC	01	OPN		Output 3					2	31		14	PLC 56A	5	R56-DRL-40				
+									GND					PLC 56A	6	R56-DRL-40				
+SC1	VGC	03	OPN	CXI:SC1:VGC:03:OPN_DO	Output 3		A5			2	32	+A1								102
+									GND	2	32	-A2								
+									+24VDC	2	32		11							
+SC1	VGC	3	OPN							2	32		14	PLC 56A	17	R56-DRL-40				
+									GND					PLC 56A	18	R56-DRL-40				
+SC1	VGC	04	OPN	CXI:SC1:VGC:04:OPN_DO	Output 3		A6			2	33	+A1								107
+									GND	2	33	-A2								
+									+24VDC	2	33		11							
+SC1	VGC	04	OPN							2	33		14	PLC 56A	23	R56-DRL-40				
+									GND					PLC 56A	24	R56-DRL-40				
+SC1	VCC	01	OPN	CXI:SC1:VCC:01:OPN_DO	Output 3		A7			2	34	+A1								112
+									GND	2	34	-A2								
+									+24VDC	2	34		11							
+SC1	VCC	1	OPN							2	34		14	PLC 56E	7	R56-DRL-36				
+									GND					PLC 56E	8	R56-DRL-36				
+					Output 3			CI	GND											
+					Output 3			VI	+24VDC											
+SC1	VCC	02	OPN	CXI:SC1:VCC:02:OPN_DO	Output 3		B0			2	35	+A1								119
+									GND	2	35	-A2								
+									+24VDC	2	35		11							
+SC1	VCC	02	OPN							2	35		14	PLC 56E	9	R56-DRL-36				
+									GND					PLC 56E	10	R56-DRL-36				
+SC1	VIC	01	OPN	CXI:SC1:VIC:01:OPN_DO	Output 3		B1			2	36	+A1								124
+									GND	2	36	-A2								
+									+24VDC	2	36		11							
+SC1	VIC	1	OPN							2	36		14	PLC 56E	11	R56-DRL-36				
+									GND					PLC 56E	12	R56-DRL-36				
+SC1	VIC	02	OPN	CXI:SC1:VIC:02:OPN_DO	Output 3		B2			2	37	+A1								129
+									GND	2	37	-A2								
+									+24VDC	2	37		11							
+SC1	VIC	02	OPN							2	37		14	PLC 56E	13	R56-DRL-36				
+									GND					PLC 56E	14	R56-DRL-36				
+SC1	VIC	03	OPN	CXI:SC1:VIC:03:OPN_DO	Output 3		B3			2	38	+A1								134
+									GND	2	38	-A2								
+									+24VDC	2	38		11							
+SC1	VIC	3	OPN							2	38		14	PLC 56E	15	R56-DRL-36				
+									GND					PLC 56E	16	R56-DRL-36				
+SC2	PTM	01	REM	CXI:SC2:PTM:01:REM_DO	Output 3		B4			2	39	+A1								139
+									GND	2	39	-A2								
+SC2	PTM	01	REM						GND	2	39		11	PLC 56B	39	R56-DRL-40	PCT-16A	X14	27	
+										2	39		14	PLC 56B	40	R56-DRL-40	PCT-16A	X14	11	
+																				
+SC2	PTM	01	START	CXI:SC2:PTM:01:START_DO	Output 3		B5			2	40	+A1								144
+									GND	2	40	-A2								
+SC2	PTM	01	START						GND	2	40		11	PLC 56B	41	R56-DRL-40	PCT-16A	X14	43	
+										2	40		14	PLC 56B	42	R56-DRL-40	PCT-16A	X14	12	
+																				
+DSU	PTM	03	RUN	CXI:DSU:PTM:03:RUN_DO	Output 3		B6			2	41	+A1								149
+									GND	2	41	-A2								
+DSU	PTM	03	RUN							2	41		11	PLC-56D	33	R56-DRL-37				
+										2	41		14	PLC-56D	34	R56-DRL-37				
+									GND											
+DSU	PTM	03	SST	CXI:DSU:PTM:03:SST_DO	Output 3		B7			2	42	+A1								154
+									GND	2	42	-A2								
+DSU	PTM	3	SST							2	42		11	PLC-56D	35	R56-DRL-37				
+										2	42		14	PLC-56D	36	R56-DRL-37				
+									GND											
+					Output 3			CII	GND											
+					Output 3			VII	+24VDC											
+DSU	VIC	03	OPN	CXI:DSU:VIC:03:OPN_DO	Output 3		C0			2	43	+A1								161
+									GND	2	43	-A2								
+									+24VDC	2	43		11							
+DSU	VIC	03	OPN							2	43		14	PLC-56D	45	R56-DRL-37				
+									GND					PLC-56D	46	R56-DRL-37				
+DSU	PTM	01	RUN	CXI:DSU:PTM:01:RUN_DO	Output 3		C1			2	44	+A1								166
+									GND	2	44	-A2								
+									+24VDC	2	44		11							
+DSU	PTM	01	RUN							2	44		14	PLC 56D	37	R56-DRL-37		J1	1	
+									GND					PLC 56D	38	R56-DRL-37		J1	2	
+DSU	PTM	01	SST	CXI:DSU:PTM:01:SST_DO	Output 3		C2			2	45	+A1								171
+									GND	2	45	-A2								
+									+24VDC	2	45		11							
+DSU	PTM	01	SST							2	45		14	PLC 56D	39	R56-DRL-37		J1	3	
+									GND					PLC 56D	40	R56-DRL-37		J1	4	
+SC1	PTM	01	REM	CXI:SC1:PTM:01:REM_DO	Output 3		C3			2	46	+A1								176
+									GND	2	46	-A2								
+SC1	PTM	01	REM							2	46		11	PLC 56C	15	R56-DRL-37	PCT-16B	X14	27	
+										2	46		14	PLC 56C	16	R56-DRL-37	PCT-16B	X14	11	
+																				
+SC1	PTM	01	START	CXI:SC1:PTM:01:START_DO	Output 3		C4			2	47	+A1								181
+									GND	2	47	-A2								
+SC1	PTM	01	START							2	47		11	PLC 56C	17	R56-DRL-37	PCT-16B	X14	43	
+										2	47		14	PLC 56C	18	R56-DRL-37	PCT-16B	X14	12	
+									GND											
+SC1	PTM	03	START	CXI:SC1:PTM:03:START_DO	Output 3		C5			1	50	+A1								186
+									GND	1	50	-A2								
+										1	50		11	PLC 56 E	23					
+										1	50		14	PLC 56E	21					
+									GND											
+SC1	PTM	03	SST	CXI:SC1:PTM:03:SST_DO	Output 3		C6			2	51	+A1								191
+									GND	2	51	-A2								
+										2	51		11	PLC 56E	23					
+										2	51		14	PLC 56E	22					
+									GND											
+					Output 3		C7					+A1								196
+									GND			-A2								
+									+24VDC				11							
+													14							
+									GND											
+								CIII	GND											
+								VIII	+24VDC											
+					Output 3		D0					+A1								203
+									GND			-A2								
+													11							
+													14							
+									GND											
+					Output 3		D1					+A1								208
+									GND			-A2								
+													11							
+													14							
+																				
+					Output 3		D2					+A1								213
+									GND			-A2								
+													11							
+													14							
+																				
+					Output 3		D3					+A1								218
+									GND			-A2								
+													11							
+													14							
+																				
+					Output 3		D4					+A1								223
+									GND			-A2								
+													11							
+													14							
+																				
+					Output 3		D5					+A1								228
+									GND			-A2								
+													11							
+													14							
+																				
+					Output 3		D6					+A1								233
+									GND			-A2								
+													11							
+													14							
+																				
+					Output 3		D7					+A1								238
+									GND			-A2								
+													11							
+													14							
+																				
+					Output 3			CIV	GND											
+					Output 3			VIV	+24VDC											

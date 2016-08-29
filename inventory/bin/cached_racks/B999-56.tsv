@@ -1,0 +1,56 @@
+		FRONT		RACK B999-R56				BACK			
+											
+82.25					47	82.25					47
+80.50					46	80.50	PPL-46			PPL TO R58	46
+78.75					45	78.75					45
+77.00					44	77.00					44
+75.25					43	75.25					43
+73.50	DAQ-42			Supermicro	42	73.50					42
+71.75	DRL-40				41	71.75					41
+70.00	Vlv Ctrl, ReadB, GCC trip PTS				40	70.00					40
+68.25	TGH-39			SLAC ###	39	68.25					39
+66.50	DRL-37				38	66.50	TGH-38			SLAC ###	38
+64.75	Vlv Ctrl, ReadB, GCC trip PTS				37	64.75	DRL-36				37
+63.00	BNK-31				36	63.00	Vlv Ctrl, ReadB, GCC trip PTS				36
+61.25					35	61.25	DRL-32				35
+59.50					34	59.50	+12 VDC Camera, FTRs , IMB, MCS				34
+57.75					33	57.75	MCS,24DVC, LED,  RGA,Beckhoff				33
+56.00					32	56.00				PULS, Beckhoff, Phx Con	32
+54.25					31	54.25	PWR-31			Leviton	31
+52.50	FAN-30			FAN TRAY	30	52.50					30
+50.75					29	50.75					29
+49.00	CPCI-27			ITOF-1	28	49.00					28
+47.25	DAQ Acqiris ITOF-1				27	47.25					27
+45.50					26	45.50					26
+43.75					25	43.75					25
+42.00					24	42.00					24
+40.25					23	40.25					23
+38.50					22	38.50					22
+36.75					21	36.75					21
+35.00					20	35.00					20
+33.25	SER-19			Digi TS16MEI	19	33.25					19
+31.50	PCO-16A		PCO-16B		18	31.50					18
+29.75	Turbo Pump Controller stack				17	29.75					17
+28.00				Oerlikon Leybold 	16	28.00					16
+26.25					15	26.25	PWR-15			Leviton	15
+24.50	MCC-13				14	24.50					14
+22.75				SLAC PF-261-202	13	22.75					13
+21.00	PSM-10				12	21.00					12
+19.25					11	19.25					11
+17.50				SLAC SD-261-200	10	17.50					10
+15.75	FAN-09			FAN TRAY	09	15.75					09
+14.00	BNK-08				08	14.00					08
+12.25	PCI-05				07	12.25					07
+10.50					06	10.50					06
+08.75				Gamma Vacuum MPC	05	08.75					05
+07.00	PCI-02				04	07.00					04
+05.25					03	05.25					03
+03.50				Gamma Vacuum MPC	02	03.50					02
+01.75					01	01.75					01
+											
+			STANFORD LINEAR ACCELERATOR CENTER			LINAC COHERENT LIGHT SOURCE					
+			US DEPARTMENT OF ENERGY			INSTRUMENTATION & CONTROL RACKS					
+			STANFORD UNIVERSITY, STANFORD, CA			RACK B999-R56					
+ENGR		CHECKED		DATE		PRELIMINARY				A	
+DESIGNER/COORD				4/19/2011							
+F. PRADO				4/3/2014		Revision 2					
