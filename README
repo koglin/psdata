@@ -1,0 +1,8 @@
+For SVN help see:
+   https://confluence.slac.stanford.edu/display/PSDM/Users%27+Software+Repository
+
+To check out the psdata package, make or goto the dir you want and checkout with the following:
+svn co https://pswww.slac.stanford.edu/svn/userrepo/psdata/trunk psdata
+
+
+

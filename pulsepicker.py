@@ -155,9 +155,18 @@ class pulsepicker(psdata.Detector):
 
 # Should eventually go in sequencer.py instead of here
     def make_sequence(self, nevents=1, burst=False, picker=True,
-            shoot_code=187, mon_code=181, mon_rate=30, shoot_rate=120, picker_code=185):
+            shoot_code=187, mon_code=181, mon_rate=30, shoot_rate=120, picker_code=185, sync=None):
         """Helper function to set sequencer for shoot and monitor.
         """
+        if sync:
+            self.sequencer.set_sync(sync)
+
+        sync_rate = self.sequencer.sync_rate 
+        beam_rate = self.sequencer.beam_rate.VAL
+        if sync_rate > beam_rate:
+            print 'Setting sync_rate to be beam_rate'
+            self.sequencer.sync_marker.VAL = beam_rate
+
         eventCodes = []
         beam = []
         burst_list = []
@@ -173,13 +182,18 @@ class pulsepicker(psdata.Detector):
                 self._sequencer_mode = 'flipflop'
 
         for i in range(nevents):
+            nnext = (120/shoot_rate)-1
             if picker and (shoot_rate < 60 or nevents == 1): 
                 eventCodes.append(picker_code)
-                beam.append(0)
+                beam.append(nnext)
                 burst_list.append(0)
 
             eventCodes.append(shoot_code)
-            beam.append(1)
+            if shoot_rate == 120 or picker:
+                beam.append(1)
+            else:
+                beam.append(nnext)
+            
             if burst:
                 burst_list.append(1)
             else:
@@ -200,6 +214,8 @@ class pulsepicker(psdata.Detector):
  
         self.sequencer.set_sequence(eventCodes=eventCodes, beam=beam, burst=burst_list)
 
+        if shoot_rate > beam_rate:
+            raise Exception('ERROR:  (shoot_rate = {:} Hz) > (beam_rate = {:} Hz) results in no X-rays'.format(shoot_rate, beam_rate))
 
 
         # in future will want to automatically load all the relevant PV records.

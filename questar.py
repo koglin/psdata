@@ -13,6 +13,8 @@ class Questar(psdata.Detector):
     def __init__(self,*args,**kwargs):
 
         psdata.Detector.__init__(self,*args,**kwargs)
+        if self._data._no_evtData:
+            self._use_ami = True
         
         self._properties = {'pedestal': 0, 'roi': None}
         self.set_properties(**self._properties)

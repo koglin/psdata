@@ -21,14 +21,14 @@ fi
 echo "Setting base python paths"
 export DAQREL=/reg/g/pcds/dist/pds/cxi/current
 #export AMIREL=/reg/g/pcds/dist/pds/ami-current
-export AMIREL=/reg/g/pcds/dist/pds/cxi/ami-current
+#export AMIREL=/reg/g/pcds/dist/pds/cxi/ami-current
+export AMIREL=/reg/neh/home/ddamiani/Workarea/daq/ami-dev
 export PYTHONPATH=~koglin/lib/python:${DAQREL}/tools/procmgr:${DAQREL}/build/pdsapp/lib/x86_64-linux-opt:${AMIREL}/build/ami/lib/x86_64-linux-opt
 #export PYTHONPATH=${DAQREL}/tools/procmgr:${DAQREL}/build/pdsapp/lib/x86_64-linux:${AMIREL}/build/ami/lib/x86_64-linux
 #:/reg/neh/operator/cxiopr/lib/python:/reg/g/pcds/controls/pycasi:/reg/g/pcds/controls:/reg/g/pcds/package/epics/3.14/extensions/current/src/ChannelArchiver/casi/python/O.linux-x86_64
 
 EPICS_SITE_TOP=/reg/g/pcds/package/epics/3.14
-#source $EPICS_SITE_TOP/tools/current/bin/epicsenv.sh
-source /cds/group/pcds/epics/tools/current/bin/epicsenv.sh
+source $EPICS_SITE_TOP/tools/current/bin/epicsenv.sh
 export EPICS_CA_MAX_ARRAY_BYTES=12000000
 
 . /reg/g/psdm/etc/ana_env.sh

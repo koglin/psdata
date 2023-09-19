@@ -12,14 +12,14 @@ class cxi_stands(psdata.Detector):
 #    _stands = ['standDG2', 'stand1MS', 'standDG3', 'standDG4']
 
     _stand_detectors = {
-         'stand1MS': {
-                      'Ax': {'kb1': 84.3998, 'kb2': 64.18,    'pv': 'CXI:1MS:MMS:04'},
-                      'Ay': {'kb1': 81.5299, 'kb2': 55.2699,  'pv': 'CXI:1MS:MMS:05'},
-#                      'Az': {'kb1': 9.3998,  'kb2': 9.39978,  'pv': 'CXI:1MS:MMS:06'},
-                      'By': {'kb1': 52.281,  'kb2': 31.4952,  'pv': 'CXI:1MS:MMS:01'},
-                      'Cx': {'kb1': 54.9002, 'kb2': 37.3503,  'pv': 'CXI:1MS:MMS:02'},
-                      'Cy': {'kb1': 52.3008, 'kb2': 31.415,   'pv': 'CXI:1MS:MMS:03'},
-                     },
+#         'stand1MS': {
+#                      'Ax': {'kb1': 84.3998, 'kb2': 64.18,    'pv': 'CXI:1MS:MMS:04'},
+#                      'Ay': {'kb1': 81.5299, 'kb2': 55.2699,  'pv': 'CXI:1MS:MMS:05'},
+##                      'Az': {'kb1': 9.3998,  'kb2': 9.39978,  'pv': 'CXI:1MS:MMS:06'},
+#                      'By': {'kb1': 52.281,  'kb2': 31.4952,  'pv': 'CXI:1MS:MMS:01'},
+#                      'Cx': {'kb1': 54.9002, 'kb2': 37.3503,  'pv': 'CXI:1MS:MMS:02'},
+#                      'Cy': {'kb1': 52.3008, 'kb2': 31.415,   'pv': 'CXI:1MS:MMS:03'},
+#                     },
          'standDG2': {
                       'Ax': {'kb1': 36.0798, 'kb2': 20.33,    'pv': 'CXI:DG2:MMS:14'},
                       'Ay': {'kb1': 34.41,   'kb2': 16.58,    'pv': 'CXI:DG2:MMS:15'},
@@ -28,14 +28,14 @@ class cxi_stands(psdata.Detector):
                       'Cx': {'kb1': 41.8487, 'kb2': 25.662,   'pv': 'CXI:DG2:MMS:12'},
                       'Cy': {'kb1': 39.9501, 'kb2': 20.988,   'pv': 'CXI:DG2:MMS:13'},
                      },
-         'standDG3': {
-                      'Ax': {'kb1': 90.7329, 'kb2': 70.0217,  'pv': 'CXI:DG3:MMS:09'},
-                      'Ay': {'kb1': 88.406,  'kb2': 60.16,    'pv': 'CXI:DG3:MMS:10'},
-#                      'Az': {'kb1': -0.0034, 'kb2': -0.00323, 'pv': 'CXI:DG3:MMS:11'},
-                      'By': {'kb1': 91.088,  'kb2': 61.9193,  'pv': 'CXI:DG3:MMS:06'},
-                      'Cx': {'kb1': 91.8417, 'kb2': 70.53,    'pv': 'CXI:DG3:MMS:07'},
-                      'Cy': {'kb1': 95.2873, 'kb2': 65.8574,  'pv': 'CXI:DG3:MMS:08'},
-                     },
+#         'standDG3': {
+#                      'Ax': {'kb1': 90.7329, 'kb2': 70.0217,  'pv': 'CXI:DG3:MMS:09'},
+#                      'Ay': {'kb1': 88.406,  'kb2': 60.16,    'pv': 'CXI:DG3:MMS:10'},
+##                      'Az': {'kb1': -0.0034, 'kb2': -0.00323, 'pv': 'CXI:DG3:MMS:11'},
+#                      'By': {'kb1': 91.088,  'kb2': 61.9193,  'pv': 'CXI:DG3:MMS:06'},
+#                      'Cx': {'kb1': 91.8417, 'kb2': 70.53,    'pv': 'CXI:DG3:MMS:07'},
+#                      'Cy': {'kb1': 95.2873, 'kb2': 65.8574,  'pv': 'CXI:DG3:MMS:08'},
+#                     },
 #         'standDG4': {
 #                      'Ax': {'kb1': 107.911, 'kb2': 85.4314,  'pv': 'CXI:DG4:MMS:09'},
 #                      'Ay': {'kb1': 107.333, 'kb2': 76.101,   'pv': 'CXI:DG4:MMS:10'},

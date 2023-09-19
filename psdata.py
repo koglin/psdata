@@ -15,7 +15,6 @@ import traceback
 
 # import standard python scientific data analysis packages from ana-release
 from pylab import *
-import pandas as pd
 
 # ROOT currently messes with tab completion -- do not use until fixed 
 # idea was to use ROOT in add_histogram, but Justin may have beter ideas.
@@ -25,16 +24,10 @@ import pandas as pd
 import epics
 
 # import PCDS specific python packages from ana-release
-from RegDB import experiment_info
-import psana
 #import psami
 
-from psmon import publish
-publish.client_opts.daemon = True
-from psmon.plots import Image, XYPlot, MultiPlot
 
 from PsanaDictify import * 
-from DetectorDictify import DetectorDictify
 import psioc
 import lcls_devices
 import psutils
@@ -285,6 +278,7 @@ class psdata(object):
         print 'Loading EpicsSets for', instrument
         self.epicsLive = lcls_devices.EpicsSets(instrument=instrument, **kwargs)
         self.update_epicsLive()
+        self._kwargs['epics_live'] = True
 
     def update_epicsLive(self):
         for det in self.epicsLive._sets:
@@ -294,7 +288,7 @@ class psdata(object):
             aliases = self.epicsLive._sets[det]._aliases
             if 'epicsLive' not in self._device_sets[det]:
                 self._device_sets[det]['epicsLive'] = {}
-            
+        
             self._device_sets[det]['epicsLive'].update({'attrs': aliases})
 
     def load_daq(self, instrument=None, station=None, **kwargs):
@@ -523,6 +517,12 @@ class psdata(object):
     def runs(self):
         """Experiment run information from MySQL database and xtc directory.
         """
+        #snelson HACK
+        runs_list = []
+        return runs_list
+        #snelson HACK-end
+
+        from RegDB import experiment_info
         if experiment_info.name2id(self.exp):
             runs_list =  experiment_info.experiment_runs(self.instrument.upper(),self.exp)
             for item in runs_list:
@@ -606,7 +606,12 @@ class psdata(object):
     def load_run_summary(self):
         """Load MySQL database experiment run summary information into a dictionary.
         """
+        #snelson hack
         vrun_attrs = {}
+        self.run_summary = vrun_attrs
+        return
+        #snelson hack-end
+        from RegDB import experiment_info
         print 'Loading summary of {:} runs for {:} from SQL database'.format( \
                 len(self.runs),self.exp)
         print 'Estimate loading time ~{:} sec'.format(len(self.runs)/4)
@@ -629,6 +634,7 @@ class psdata(object):
            these may be set by custom Detector classes added with add_module
            in this case set _reloadOnLoadRun flag
         """
+        import psana
         psana_modules = ' '.join(self.psana_cfg_dict.keys())
         self.cfg_setOptions = {'psana.modules': psana_modules}
         for module, params in self.psana_cfg_dict.items():
@@ -641,6 +647,7 @@ class psdata(object):
         """Load run for experiment.
            Optionally pass 
         """
+        import psana
         if 'data_source' in kwargs:
             data_source = kwargs['data_source']
         else:
@@ -882,6 +889,7 @@ class psdata(object):
            event keys.
            Name mangle and return as pandas series.
         """
+        import pandas as pd
         data = {} 
         if not det_list:
             det_list = self._det_list
@@ -1018,6 +1026,7 @@ class psdata(object):
 
     @property
     def detectors(self):
+        from DetectorDictify import DetectorDictify
         return  DetectorDictify(self._evt, self.ds.env())
 
     @property
@@ -1144,6 +1153,10 @@ class psdata(object):
     def psmon_publish(self, force=False):
         """Publish _psplots.
         """
+        from psmon import publish
+        #publish.client_opts.daemon = True
+        from psmon.plots import Image, XYPlot, MultiPlot
+        
         if force or self.exp.startswith('dia') or (self.evt and self._master_evr.is_in_keys):
             for name, psmon_args in self._psplots.items():
                 det_class = getattr(self,psmon_args['det'])
@@ -1401,6 +1414,7 @@ class Detector(object):
                 kwargs['module'] = module
 
 #        if 'module' in kwargs:
+        print kwargs
         if len(kwargs) > 0:
             self._data.add_detector(self._name, **kwargs)
 #            self._data.add_detector(self._name, module=module, path=path, **kwargs)
@@ -1553,6 +1567,9 @@ class Detector(object):
                          (or alternatively not in date with - sign)
                          see is_eventCodePresent
         """
+        from psmon import publish
+        publish.client_opts.daemon = True
+        from psmon.plots import Image, XYPlot, MultiPlot
         plot_error = '' 
 
         if isinstance(attrs[0],list):
@@ -1896,6 +1913,8 @@ def initArgs():
                         help='epics alias file with epicsArch style file')
     parser.add_argument("--epics_dir", type=str, 
                         help='dir for epics_file used for epics aliases')
+    parser.add_argument("--no_auto_load", action="store_true", 
+                        help='Do not automatically load epicsArch aliases')
     parser.add_argument("--no_epics_aliases", action="store_true", 
                         help='Do not make epics aliases available')
     parser.add_argument("--show_errors", action="store_true", default=False,

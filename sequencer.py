@@ -27,7 +27,7 @@ hutch_info = {
             'id': 6,
             },
         'mfx': {
-            'id': 5,
+            'id': 7,
             },
         }
 
@@ -42,13 +42,14 @@ class sequencer(psdata.Detector):
          https://confluence.slac.stanford.edu/download/attachments/146714251/Event%20Sequencer%20User%20Manual%20-%20rev%20N.docx?version=1&modificationDate=1426303866000&api=v2
 
     """
+    dictRateToSyncMarker = {0.5:0, 1:1, 5:2, 10:3, 30:4, 60:5, 120:6, 360:7, 0:6}
 
     def __init__(self,*args,**kwargs):
 
         psdata.Detector.__init__(self,*args,**kwargs)
 
         instrument = kwargs.get('instrument', self._data.instrument)
-        hutch_id = hutch_info[instrument]['id']
+        hutch_id = kwargs.get('hutch_id', hutch_info[instrument]['id'])
         seq_base = 'ECS:SYS0:{:}:'.format(hutch_id)
 
         # in future will want to automatically load all the relevant PV records.
@@ -211,8 +212,16 @@ class sequencer(psdata.Detector):
         self.set_sequence(eventCodes=eventCodes, beam=beam)
         self.show_sequence()
 
+    @property
+    def sync_rate(self):
+        """sync marker rate.
+        """
+        rate = {0:0.5, 1:1, 2:5, 3:10, 4:30, 5:60, 6:120, 7:360}.get(self.sync_marker.VAL)
+        return rate
+
     def set_sync(self, sync):
         """Set the sequencer Sync Marker.
+           e.g., sync='30Hz'
         """
         if sync:
             try:

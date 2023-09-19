@@ -1,0 +1,426 @@
+#!/reg/g/psdm/bin/uss.sh
+# -*- mode: sh; -*-
+#
+# $Id: sit_setup.uss 9269 2014-11-18 19:58:53Z wilko@SLAC.STANFORD.EDU $
+#
+# Usage: SIT_setup [key_options] [options]
+#  key_options:
+#    -p processor - define processor type explicitely
+#    -o os        - define OS name explicitely
+#    -c compiler  - define compiler explicitely
+#    -b build     - define build type explicitely
+#    -a name      - define SIT_ARCH explicitely
+#    -e env       - override SIT_ENV
+#    -s           - strict mode. Exit if unknown cmdline options are found
+#
+
+# +++++++++ few adjustible parameters +++++++++
+
+def_sit_root=/reg/g/psdm
+
+# SCons versions
+scons_ver="2.1.0"
+
+# The map which lists acceptable (compatible) architectures 
+# for the current processor. For example if system is detected
+# with the i686 the user may choose either i686 or i386.
+proc_map="i686:i686,i386 \
+          x86_64:x86_64,i686,i386"
+
+# --------- few adjustible parameters ---------
+
+# +++++++++ few internal functions +++++++++
+
+# messaging
+err() { echo $* 1>&2 ; exit 1 ; }
+warn() { echo $* 1>&2 ; }
+
+#
+# add element to a set
+#
+set_add() {
+    res="$1"
+    test -n "$res" -a -n "$2" && res="$res,"
+    res="$res$2"
+    echo $res
+}
+
+#
+# returns intersection of two sets, each set is a list of comma-separated words
+#
+set_intersect() {
+    res=""
+    for w1 in `echo $1 | tr , ' '` ; do
+        for w2 in `echo $2 | tr , ' '` ; do
+            if [ "$w1" = "$w2" ] ; then
+                res=`set_add $res $w1`
+                break
+            fi
+        done
+    done
+    echo $res
+}
+
+#
+# returns difference of two sets, each set is a list of comma-separated words
+#
+set_subtract() {
+    res=""
+    for w1 in `echo $1 | tr , ' '` ; do
+        x=$w1
+        for w2 in `echo $2 | tr , ' '` ; do
+            if [ "$w1" = "$w2" ] ; then
+                x=''
+                break
+            fi
+        done
+        res=`set_add $res $x`
+    done
+    echo $res
+}
+
+# return first element from set
+set_first() { echo $1 | cut -d, -f1 ; }
+
+# same thing but works as filter
+filter_first() { cut -d, -f1 ; }
+
+#
+# Find key in map. Map is a string of "key:val key:val default:val" pairs.
+#
+map_find() {
+    def=""
+    for x in $1 ; do
+        map_key=`echo $x | cut -d: -f1`
+        if [ "$map_key" = "$2" ] ; then
+            map_val=`echo $x | cut -d: -f2-`
+            echo $map_val
+            return
+        fi
+        if [ "$map_key" = "default" ] ; then
+            def=`echo $x | cut -d: -f2-`
+        fi
+    done
+    echo $def
+}
+
+# -----------------------------------------
+
+abspath() {
+    cd $1
+    path=$(pwd)
+    cd - >/dev/null
+    echo ${path}
+}
+
+# --------- few internal functions ---------
+
+proc=""
+os=""
+comp=""
+build=""
+sit_arch=""
+sit_env=""
+
+# get the options
+while getopts p:o:c:b:a:e:s c ; do
+    case $c in
+        p) proc="$OPTARG" ;;
+        o) os="$OPTARG" ;;
+        c) comp="$OPTARG" ;;
+        b) build="$OPTARG" ;;
+        a) sit_arch="$OPTARG" ;;
+        e) sit_env="$OPTARG" ;;
+        s) strict=1 ;;
+        \?) exit 2 ;;
+    esac
+done
+shift `expr $OPTIND - 1`
+
+#
+# Check/set necessary environment
+#
+test -n "$sit_env" && set_env SIT_ENV "$sit_env"
+test -n "$SIT_ENV" || set_env SIT_ENV "default"
+test -n "$SIT_ROOT" || set_env SIT_ROOT "$def_sit_root"
+test -n "$SIT_RELDIR" || set_env SIT_RELDIR "$SIT_ROOT/sw/releases"
+
+# Subversion root directory
+test -n "$SIT_SVN" || set_env SIT_SVN "https://pswww.slac.stanford.edu/svn/psdmrepo"
+test -n "$SIT_SVN_USER" || set_env SIT_SVN_USER "https://pswww.slac.stanford.edu/svn/userrepo"
+
+#
+# determine the release to use, could be the first command line argument,
+# or the content of .sit_release, ~/SIT_RELEASE, or "current" or "xxx-current"
+#
+
+unset_env SIT_RELEASE
+if [ -n "$1" ] ; then
+    if [ "$1" = "nobase" -o -f "$SIT_RELDIR/$1/.sit_release" ] ; then
+        set_env SIT_RELEASE "$1"
+        shift 1
+    fi
+fi
+if [ -z "${SIT_RELEASE}" ] ; then
+    if [ -n "$1" ] && [ -f ${1}/.sit_release ] ; then
+        usrel=$1
+        shift 1
+    elif [ -f .sit_release ] ; then
+        usrel=./
+    fi
+    if [ -n "${usrel}" ] ; then
+        usrel=$(abspath ${usrel})
+        rel=$(cat ${usrel}/.sit_release)
+        if [ -d "$SIT_RELDIR/$rel" ] ; then
+  	        set_env SIT_RELEASE "$rel"
+        else
+            # if .sit_release points to non-existing release it means new production
+            set_env SIT_RELEASE "nobase"
+        fi
+        [[ "${usrel}" = "${SIT_RELDIR}/${rel}" ]] && usrel=""
+    fi
+fi
+
+if [ -z "$SIT_RELEASE" -a -r "${HOME}/SIT_RELEASE" ] ; then
+    rel=`cat "${HOME}/SIT_RELEASE"`
+    test -d "$SIT_RELDIR/$rel" && set_env SIT_RELEASE "$rel"
+fi
+if [ -z "$SIT_RELEASE" ] ; then
+    if [ "$SIT_ENV" = "default" ] ; then
+        set_env SIT_RELEASE dm-current
+    else
+        set_env SIT_RELEASE ${SIT_ENV}-current
+    fi
+fi
+
+#
+# Command-line "options" as a set (comma-separated)
+#
+options=`echo "$@" | tr ' ' ','`
+used_options=""
+
+#
+# processor architecture
+#
+if [ -z "$sit_arch" -a -z "$proc" ] ; then
+    proc=`uname -p`
+    mach=`uname -m`
+    # use i686 instead of athlon
+    proc=`map_find "athlon:i686 unknown:$mach default:$proc" $proc`
+    proclist=`map_find "$proc_map" $proc`
+    test -n "$proclist" || err "Failed to determine processor type"
+    # let user choose processor type
+    proc=`set_intersect "$options" "$proclist" | filter_first`
+    # if user cannot choose anything then use first from the list
+    if [ -n "$proc" ] ; then
+        used_options=`set_add $used_options $proc`
+    else
+        proc=`set_first $proclist`
+    fi
+fi
+
+#
+# OS type
+#
+if [ -z "$sit_arch" -a -z "$os" ] ; then
+    os=`uname -s`
+    if [ "$os" = "Linux" -a -r /etc/redhat-release ] ; then
+        rh=`cat /etc/redhat-release | tr ' ' _`
+        case $rh in
+            Red_Hat_Enterprise_Linux_*_release_5.*)   os=rhel5 ;;
+            Red_Hat_Enterprise_Linux_*_release_6.*)   os=rhel6 ;;
+            Red_Hat_Enterprise_Linux_*_release_7.*)   os=rhel7 ;;
+            CentOS_release_5.*)                       os=rhel5 ;;
+            CentOS_release_6.*)                       os=rhel6 ;;
+            CentOS_release_7.*)                       os=rhel7 ;;
+            Scientific_Linux*release_5.*)             os=rhel5 ;;
+            Scientific_Linux*release_6.*)             os=rhel6 ;;
+            Scientific_Linux*release_7.*)             os=rhel7 ;;
+        esac
+    elif [ "$os" = "Linux" -a -r /etc/SuSE-release ] ; then
+        rel=`cat /etc/SuSE-release | grep VERSION | tr -d ' '`
+        case $rel in
+            VERSION=11.*) os=suse11 ;;
+            VERSION=12.*) os=suse12 ;;
+        esac
+    elif [ "$os" = "Linux" -a -r /etc/lsb-release ] ; then
+        . /etc/lsb-release
+        if [ "$DISTRIB_ID" = "Ubuntu" ] ; then
+            os=`echo ubu${DISTRIB_RELEASE} | cut -d. -f1`
+        fi
+    elif [ "$os" = "SunOS" ] ; then
+        case `uname -r` in
+            5.8)  os="sol8" ;;
+            5.9)  os="sol9" ;;
+            5.10) os="sol10" ;;
+        esac
+    fi
+    test -n "$os" || err "Failed to determine OS type"
+fi
+
+#
+# Now we need compiler, it's determined from the list of the 
+# architectures in the release. For release look at several places:
+# first in local directory, then in $SIT_RELDIR/$SIT_RELEASE or
+# $SIT_RELDIR/current or ana-current. If nothing is found use gcc.
+#
+if [ -z "$sit_arch" -a -z "$comp" ] ; then
+    if [ "$SIT_RELEASE" = "nobase" ] ; then
+        locations=". $SIT_RELDIR/current $SIT_RELDIR/ana-current"
+    else 
+        locations=". $SIT_RELDIR/$SIT_RELEASE"
+    fi
+    
+    for loc in $locations; do
+        compilers=`/bin/ls -1 $loc/arch 2>/dev/null | grep "$proc-$os" | cut -d- -f3 | sort -u | tr ' ' ','`
+        test -n "$compilers" && break
+    done
+    
+    # use gcc version if we can find it
+    test -n "$compilers" || \
+        compilers=`gcc -v 2>&1 | sed -n 's/gcc version \([0-9]*\)\.\([0-9]*\).*/gcc\1\2/p'`
+    # default useless value
+    test -n "$compilers" || compilers="gcc"
+  
+  # let user select one from many options or use first one
+    comp=`set_intersect $options $compilers`
+    if [ -n "$comp" ] ; then
+        used_options=`set_add $used_options $comp`
+    else
+        comp=`set_first $compilers`
+    fi
+fi
+
+#
+# Choose build type/optimization
+#
+if [ -z "$sit_arch" -a -z "$build" ] ; then
+    build=`set_intersect $options "opt,dbg,prof" | filter_first`
+    if [ -n "$build" ] ; then
+        used_options=`set_add $used_options $build`
+    else
+        build="opt"
+    fi
+fi
+
+# check there are no unused options in command line
+unused=`set_subtract $options $used_options`
+if [ -n "$unused" ] ; then
+    [ -n "$strict" ] && err "Error unrecognized command line arguments:" $unused 
+#    warn "Warning unrecognized command line arguments:" $unused 
+fi
+
+# define architecture
+if [ -z "$sit_arch" ] ; then
+    sit_arch_base="$proc-$os-$comp"
+    sit_arch="$proc-$os-$comp-$build"
+else
+    sit_arch_base=`echo $sit_arch | cut -d- -f1-3`
+fi
+set_env SIT_ARCH "$sit_arch"
+
+# remove all PSDM dirs from PATHs for the moment, keep sw/external but remove scons and pyextra
+remove_from_path PATH "$SIT_ROOT/bin/*"
+remove_from_path PATH "$SIT_ROOT/sw/releases/.*"
+remove_from_path PATH "$SIT_ROOT/sw/external/scons/.*"
+remove_from_path PATH "$SIT_ROOT/sw/external/pyextra/.*"
+remove_from_path PATH ".*/arch/[^/]*/bin/*"
+remove_from_path LD_LIBRARY_PATH "$SIT_ROOT/sw/.*"
+remove_from_path LD_LIBRARY_PATH ".*/arch/[^/]*/lib/*"
+remove_from_path PYTHONPATH "$SIT_ROOT/sw/.*"
+remove_from_path PYTHONPATH "$SIT_ROOT/sw/external/pyextra/.*"
+remove_from_path PYTHONPATH ".*/arch/[^/]*/python/*.*"
+unset_env SIT_REPOS
+
+# We need to make sure that correct python binary is found in the path,
+# recent releases contain a link arch/$SIT_ARCH/bin/python which points 
+# to right place. Check that link in base release or current release,
+# if it exists then nothing needs to be done, it will be in the PATH
+python=""
+if [ "$SIT_RELEASE" != "nobase" -a -x "$SIT_RELDIR/$SIT_RELEASE/arch/$SIT_ARCH/bin/python" ] ; then
+    python="$SIT_RELDIR/$SIT_RELEASE/arch/$SIT_ARCH/bin/python"
+elif [ -n "${usrel}" -a -x "${usrel}/arch/$SIT_ARCH/bin/python" ] ; then
+    python="${usrel}/arch/$SIT_ARCH/bin/python"
+else
+    # No python link found in current or base release, this can mean one of two things:
+    # - we are building new full release, just checked it out, no links were made yet
+    # - we are using very old release which does not have python link
+    # If this is a new release then it should have SConsTools/app/psdm-python-config script
+    # which we will run to get the info we need, otherwise do nothing (python should be in the 
+    # PATH already).
+
+    if [ -f SConsTools/app/psdm-python-config ] ; then
+        pypath=`sh SConsTools/app/psdm-python-config PYTHON_BINDIR`
+        # potentially this may need update to LD_LIBRARY_PATH as well,
+        # but for now I know that we build python with correct RPATH
+        test -n "$pypath" && prepend_path PATH "$pypath"
+    fi    
+fi
+
+# on rhel5 add OpenMPI library location
+if [ "$os" = "rhel5" ] ; then
+    remove_from_path LD_LIBRARY_PATH "/usr/lib64/openmpi/1.4-gcc/lib"
+    prepend_path LD_LIBRARY_PATH "/usr/lib64/openmpi/1.4-gcc/lib"
+fi
+
+# add SIT_ROOT/bin to PATH
+prepend_path PATH "$SIT_ROOT/bin"
+test "$SIT_RELEASE" = "nobase" || prepend_path PATH "$SIT_RELDIR/$SIT_RELEASE/arch/$SIT_ARCH/bin"
+
+[ -n "${usrel}" ] && prepend_path PATH "${usrel}/arch/$SIT_ARCH/bin" 
+
+# shared libs path
+test "$SIT_RELEASE" = "nobase" || prepend_path LD_LIBRARY_PATH "$SIT_RELDIR/$SIT_RELEASE/arch/$SIT_ARCH/lib"
+
+[ -n "${usrel}" ] && prepend_path LD_LIBRARY_PATH "${usrel}/arch/$SIT_ARCH/lib"
+
+# add SCons to the PATH, this has to be done when other PATH components are set already
+# as it needs correct python executable to be found
+pyver=`python -c "from distutils import sysconfig; print sysconfig.get_config_var('VERSION')"`
+for v in $scons_ver ; do
+    if [ -d "$SIT_ROOT/sw/external/scons/$v-python$pyver/bin" ] ; then
+        prepend_path PATH "$SIT_ROOT/sw/external/scons/$v-python$pyver/bin"
+        break
+    fi
+done
+
+# releases dirs
+test "$SIT_RELEASE" = "nobase" || set_env SIT_REPOS "$SIT_RELDIR/$SIT_RELEASE"
+
+# extend PYTHONPATH
+has_pyextra="no"
+# for releases without base (these are brand new releases) assume that they all have pyextra links, 
+# otherwise check base release for pyextra and current release too
+test "$SIT_RELEASE" = "nobase" -o -e "$SIT_RELDIR/$SIT_RELEASE/arch/$SIT_ARCH/python/pyextra" && has_pyextra="yes"
+[ -n "${usrel}" ] && test -d "./pyextra" && has_pyextra="yes"
+if [ $has_pyextra = "yes" ]; then
+    test "$SIT_RELEASE" = "nobase" || prepend_path PYTHONPATH "$SIT_RELDIR/$SIT_RELEASE/arch/$SIT_ARCH/python/pyextra"
+    [ -n "${usrel}" ] && prepend_path PYTHONPATH "${usrel}/arch/$SIT_ARCH/python/pyextra"
+else
+    # we have a directory with extra Python modules, add it to PATH and PYTHONPATH
+    prepend_path PYTHONPATH "$SIT_ROOT/sw/external/pyextra/$SIT_ARCH/lib/python$pyver/site-packages"
+    prepend_path PATH "$SIT_ROOT/sw/external/pyextra/$SIT_ARCH/bin"
+fi
+test "$SIT_RELEASE" = "nobase" || prepend_path PYTHONPATH "$SIT_RELDIR/$SIT_RELEASE/arch/$SIT_ARCH/python"
+
+[ -n "${usrel}" ] && prepend_path PYTHONPATH "${usrel}/arch/$SIT_ARCH/python"
+
+# extend SIT_DATA
+set_env SIT_DATA "$SIT_ROOT/data"
+test "$SIT_RELEASE" = "nobase" || prepend_path SIT_DATA "$SIT_RELDIR/$SIT_RELEASE/data"
+test -d "$SIT_ROOT/data/_override" && prepend_path SIT_DATA "$SIT_ROOT/data/_override"
+test -d "$SIT_ROOT/data/_override/_releases/$SIT_RELEASE" && prepend_path SIT_DATA "$SIT_ROOT/data/_override/_releases/$SIT_RELEASE"
+[[ -n "${usrel}" ]] && prepend_path SIT_DATA "${usrel}/data"
+
+# if there is no base release but .sit_release is there then use it
+if [ "$SIT_RELEASE" = "nobase" ]; then
+    rel=$(cat .sit_release)
+    if [ -n "${rel}" ] ; then
+        set_env SIT_RELEASE "${rel}"
+    else
+        unset_env SIT_RELEASE
+    fi
+fi
+
+# return success
+true

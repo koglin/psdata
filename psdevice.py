@@ -21,6 +21,9 @@ motor_dict = {
         'arcus':  {'desc':   'Piezo PMC 100 Motor Record',
                    'module': 'pmc100',
                    'class':  'Arcus'},
+        'mmca':   {'desc':   'Piezo MCA100 Motor Record',
+                   'module': 'mmca',
+                   'class':  'Mmca'},
         }
 
 # Use path of lcls_records

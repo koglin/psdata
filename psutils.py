@@ -178,6 +178,7 @@ def active_experiment(*args, **kwargs):
       @return: the list of run descriptors as explained above
     
     """
+    return 'cxic00318'
     from RegDB import experiment_info
     if len(args) > 0:
         kwargs['instrument'] = args[0]
@@ -228,6 +229,7 @@ def experiment_guess(*args, **kwargs):
     Use get_experiments to get a list of all of your experiments.
     instrument is an optional keyword to narrow the search
     """
+    return 'cxic00318'
     from RegDB import experiment_info
     if len(args) == 0:
         global _exp_good_guess

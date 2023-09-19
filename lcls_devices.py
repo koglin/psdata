@@ -78,16 +78,19 @@ def camviewer_dict(file_name,file_dir):
                 cam_list.append(line)
 
     for cam in cam_list:
-        info = cam.rsplit(',')
-        key = info[1].lstrip()
-        cam_dict.update({key: 
-                        { 'base': info[1].lstrip(), 
-                          'evr': info[2].lstrip(), 
-                          'alias': info[3].replace('\n','').lstrip(), 
-                          'type': info[0].lstrip()}
-                        })
-        if len(info) > 4:
-            cam_dict[key].update({'other': info[4].replace('\n','').lstrip()})
+        try:
+            info = cam.rsplit(',')
+            key = info[1].lstrip()
+            cam_dict.update({key: 
+                            { 'base': info[1].lstrip(), 
+                              'evr': info[2].lstrip(), 
+                              'alias': info[3].replace('\n','').lstrip(), 
+                              'type': info[0].lstrip()}
+                            })
+            if len(info) > 4:
+                cam_dict[key].update({'other': info[4].replace('\n','').lstrip()})
+        except:
+            print 'Cannot load', cam
 
     return cam_dict
 
